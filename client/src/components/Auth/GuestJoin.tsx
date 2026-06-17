@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 
-const GuestJoin: React.FC = () => {
+const GuestJoin = () => {
   const [displayName, setDisplayName] = useState('');
   const [phraseCode, setPhraseCode] = useState('');
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: any) => {
     e.preventDefault();
     navigate(`/room/${phraseCode}?guest=true&name=${encodeURIComponent(displayName)}`);
   };
