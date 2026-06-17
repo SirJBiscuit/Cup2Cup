@@ -49,7 +49,16 @@ router.post('/create', optionalAuth, async (req, res) => {
       [ownerId, phraseCode, actuallyPersistent, passwordHash, maxParticipants, expiresAt]
     );
 
-    res.status(201).json({ room: result.rows[0] });
+    const room = result.rows[0];
+    res.status(201).json({
+      room: {
+        id: room.id,
+        phraseCode: room.phrase_code,
+        isPersistent: room.is_persistent,
+        maxParticipants: room.max_participants,
+        createdAt: room.created_at,
+      }
+    });
   } catch (error) {
     console.error('Create room error:', error);
     res.status(500).json({ error: 'Failed to create room' });
@@ -60,14 +69,24 @@ router.post('/create', optionalAuth, async (req, res) => {
 router.get('/my-rooms', authenticateToken, async (req, res) => {
   try {
     const result = await query(
-      `SELECT id, phrase_code, is_persistent, max_participants, created_at, last_activity
+      `SELECT id, phrase_code, is_persistent, password_hash IS NOT NULL as has_password, max_participants, created_at, last_activity
        FROM phrase_codes
        WHERE owner_id = $1
        ORDER BY last_activity DESC`,
       [req.user.id]
     );
 
-    res.json({ rooms: result.rows });
+    const rooms = result.rows.map(room => ({
+      id: room.id,
+      phraseCode: room.phrase_code,
+      isPersistent: room.is_persistent,
+      hasPassword: room.has_password,
+      maxParticipants: room.max_participants,
+      createdAt: room.created_at,
+      lastActivity: room.last_activity,
+    }));
+
+    res.json({ rooms });
   } catch (error) {
     console.error('Get rooms error:', error);
     res.status(500).json({ error: 'Failed to get rooms' });
