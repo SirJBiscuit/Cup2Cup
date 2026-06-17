@@ -50,6 +50,10 @@ app.use('/api/auth', authRoutes);
 app.use('/api/rooms', roomRoutes);
 app.use('/api/music', musicRoutes);
 
+// LiveKit routes (optional - only works if LiveKit is configured)
+import livekitRoutes from './routes/livekit.js';
+app.use('/api/livekit', livekitRoutes);
+
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
