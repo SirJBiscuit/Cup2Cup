@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import socketService from '../../services/socket';
+import webrtcService from '../../services/webrtc';
 import type { Participant, ChatMessage } from '../../types';
 
 const VoiceRoom = () => {
@@ -14,6 +15,8 @@ const VoiceRoom = () => {
   const [isMuted, setIsMuted] = useState(false);
   const [isDeafened, setIsDeafened] = useState(false);
   const [connected, setConnected] = useState(false);
+  const [voiceEnabled, setVoiceEnabled] = useState(false);
+  const [micError, setMicError] = useState('');
 
   useEffect(() => {
     const isGuest = searchParams.get('guest') === 'true';
@@ -26,17 +29,63 @@ const VoiceRoom = () => {
       displayName: isGuest && guestName ? decodeURIComponent(guestName) : 'User',
     });
 
-    socketService.onJoinedRoom((data) => {
+    socketService.onJoinedRoom(async (data) => {
       setConnected(true);
       setParticipants(data.participants);
+      
+      // Initialize WebRTC after joining room
+      try {
+        await webrtcService.initialize();
+        setVoiceEnabled(true);
+        
+        // Create offers to existing participants
+        data.participants.forEach((participant) => {
+          if (participant.socketId !== socket.id) {
+            webrtcService.createOffer(participant.socketId);
+          }
+        });
+      } catch (error: any) {
+        setMicError(error.message || 'Failed to access microphone');
+        console.error('Microphone error:', error);
+      }
     });
 
     socketService.onRoomParticipants((data) => {
+      const oldParticipants = participants;
       setParticipants(data.participants);
+      
+      // Handle new participants
+      data.participants.forEach((participant) => {
+        const isNew = !oldParticipants.find(p => p.socketId === participant.socketId);
+        if (isNew && participant.socketId !== socket.id && voiceEnabled) {
+          webrtcService.createOffer(participant.socketId);
+        }
+      });
+      
+      // Handle removed participants
+      oldParticipants.forEach((oldParticipant) => {
+        const stillPresent = data.participants.find(p => p.socketId === oldParticipant.socketId);
+        if (!stillPresent) {
+          webrtcService.removePeer(oldParticipant.socketId);
+        }
+      });
     });
 
     socketService.onChatMessage((message) => {
       setChatMessages((prev) => [...prev, message]);
+    });
+
+    // WebRTC signaling handlers
+    socketService.onOffer(({ offer, fromSocketId }) => {
+      webrtcService.handleOffer(fromSocketId, offer);
+    });
+
+    socketService.onAnswer(({ answer, fromSocketId }) => {
+      webrtcService.handleAnswer(fromSocketId, answer);
+    });
+
+    socketService.onICECandidate(({ candidate, fromSocketId }) => {
+      webrtcService.handleIceCandidate(fromSocketId, candidate);
     });
 
     socketService.onError((error) => {
@@ -46,9 +95,10 @@ const VoiceRoom = () => {
 
     return () => {
       socket.emit('leave-room', { phraseCode });
+      webrtcService.disconnect();
       socketService.disconnect();
     };
-  }, [phraseCode, searchParams, navigate]);
+  }, [phraseCode, searchParams, navigate, participants, voiceEnabled]);
 
   const handleSendMessage = (e: any) => {
     e.preventDefault();
@@ -60,6 +110,24 @@ const VoiceRoom = () => {
 
   const handleLeaveRoom = () => {
     navigate('/');
+  };
+
+  const handleMuteToggle = () => {
+    if (isMuted) {
+      webrtcService.unmute();
+    } else {
+      webrtcService.mute();
+    }
+    setIsMuted(!isMuted);
+  };
+
+  const handleDeafenToggle = () => {
+    if (isDeafened) {
+      webrtcService.undeafen();
+    } else {
+      webrtcService.deafen();
+    }
+    setIsDeafened(!isDeafened);
   };
 
   return (
@@ -119,31 +187,43 @@ const VoiceRoom = () => {
 
             <div className="mt-6 pt-6 border-t border-gray-700">
               <h3 className="text-lg font-semibold mb-3">Audio Controls</h3>
+              
+              {micError && (
+                <div className="mb-3 bg-red-900/20 border border-red-800 text-red-400 px-4 py-2 rounded-lg text-sm">
+                  {micError}
+                </div>
+              )}
+              
+              {voiceEnabled && (
+                <div className="mb-3 bg-green-900/20 border border-green-800 text-green-400 px-4 py-2 rounded-lg text-sm">
+                  🎤 Voice chat active
+                </div>
+              )}
+              
               <div className="flex gap-3">
                 <button
-                  onClick={() => setIsMuted(!isMuted)}
+                  onClick={handleMuteToggle}
+                  disabled={!voiceEnabled}
                   className={`flex-1 py-3 px-4 rounded-lg font-medium transition ${
                     isMuted
                       ? 'bg-red-600 hover:bg-red-700'
                       : 'bg-gray-700 hover:bg-gray-600'
-                  }`}
+                  } disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
                   {isMuted ? '🔇 Unmute' : '🎤 Mute'}
                 </button>
                 <button
-                  onClick={() => setIsDeafened(!isDeafened)}
+                  onClick={handleDeafenToggle}
+                  disabled={!voiceEnabled}
                   className={`flex-1 py-3 px-4 rounded-lg font-medium transition ${
                     isDeafened
                       ? 'bg-red-600 hover:bg-red-700'
                       : 'bg-gray-700 hover:bg-gray-600'
-                  }`}
+                  } disabled:opacity-50 disabled:cursor-not-allowed`}
                 >
                   {isDeafened ? '🔇 Undeafen' : '🔊 Deafen'}
                 </button>
               </div>
-              <p className="text-xs text-gray-400 mt-3 text-center">
-                Voice chat coming soon! WebRTC implementation in progress.
-              </p>
             </div>
           </div>
         </div>
