@@ -1,0 +1,13 @@
+[Unit]
+Description=LiveKit Server
+After=network.target redis.service
+
+[Service]
+Type=simple
+User=livekit
+ExecStart=/usr/local/bin/livekit-server --config /etc/livekit/config.yaml
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

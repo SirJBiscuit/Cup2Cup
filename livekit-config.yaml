@@ -1,0 +1,25 @@
+port: 7880
+rtc:
+  port_range_start: 50000
+  port_range_end: 60000
+  use_external_ip: true
+  
+redis:
+  address: localhost:6379
+  
+keys:
+  APIKey: Fw1xtxVPRex+P1CZQtbJnEkXEB+HpWIuNsP0f6RhNTk=
+  APISecret: 5NkvX/NP1c6loJ0Ut7uHTK4vFXU0EFlkYyr0i6xWvbA=
+
+room:
+  auto_create: false
+  empty_timeout: 300
+  max_participants: 20
+
+logging:
+  level: info
+  
+turn:
+  enabled: true
+  domain: cup2cup.xyz
+  tls_port: 5349
