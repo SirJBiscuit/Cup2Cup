@@ -16,9 +16,13 @@ const generatePhraseCode = () => {
 };
 
 // Create room
-router.post('/create', authenticateToken, async (req, res) => {
+router.post('/create', optionalAuth, async (req, res) => {
   try {
     const { isPersistent = true, password, maxParticipants = 10 } = req.body;
+    
+    // Guests can only create temporary rooms
+    const isGuest = !req.user;
+    const actuallyPersistent = isGuest ? false : isPersistent;
     
     let phraseCode = generatePhraseCode();
     let attempts = 0;
@@ -35,13 +39,14 @@ router.post('/create', authenticateToken, async (req, res) => {
     }
 
     const passwordHash = password ? await bcrypt.hash(password, 10) : null;
-    const expiresAt = isPersistent ? null : new Date(Date.now() + 24 * 60 * 60 * 1000);
+    const expiresAt = actuallyPersistent ? null : new Date(Date.now() + 24 * 60 * 60 * 1000);
+    const ownerId = req.user ? req.user.id : null;
 
     const result = await query(
       `INSERT INTO phrase_codes (owner_id, phrase_code, is_persistent, password_hash, max_participants, expires_at)
        VALUES ($1, $2, $3, $4, $5, $6)
        RETURNING id, phrase_code, is_persistent, max_participants, created_at`,
-      [req.user.id, phraseCode, isPersistent, passwordHash, maxParticipants, expiresAt]
+      [ownerId, phraseCode, actuallyPersistent, passwordHash, maxParticipants, expiresAt]
     );
 
     res.status(201).json({ room: result.rows[0] });
