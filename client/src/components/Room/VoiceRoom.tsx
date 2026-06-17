@@ -13,18 +13,11 @@ const VoiceRoom = () => {
   const [chatInput, setChatInput] = useState('');
   const [isMuted, setIsMuted] = useState(false);
   const [isDeafened, setIsDeafened] = useState(false);
-  const [displayName, setDisplayName] = useState('');
   const [connected, setConnected] = useState(false);
 
   useEffect(() => {
     const isGuest = searchParams.get('guest') === 'true';
     const guestName = searchParams.get('name');
-    
-    if (isGuest && guestName) {
-      setDisplayName(decodeURIComponent(guestName));
-    } else {
-      setDisplayName('User');
-    }
 
     const socket = socketService.connect();
     
