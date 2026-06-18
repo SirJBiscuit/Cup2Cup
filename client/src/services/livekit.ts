@@ -53,8 +53,10 @@ class LiveKitService {
     if (this.room) {
       this.room.remoteParticipants.forEach((participant) => {
         participant.audioTrackPublications.forEach((publication) => {
-          if (publication.track) {
-            publication.track.setVolume(volume);
+          if (publication.track && publication.track.attachedElements.length > 0) {
+            publication.track.attachedElements.forEach((element: HTMLMediaElement) => {
+              element.volume = volume;
+            });
           }
         });
       });
