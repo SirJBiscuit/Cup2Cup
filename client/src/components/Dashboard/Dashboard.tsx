@@ -89,32 +89,33 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-      <nav className="bg-white dark:bg-gray-800 shadow">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 animate-fadeIn">
+      <nav className="bg-white dark:bg-gray-800 shadow-lg sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center flex-wrap gap-3">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
             Cup2Cup
           </h1>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4 flex-wrap">
             <button
               onClick={() => setDarkMode(!darkMode)}
-              className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+              className="p-2 sm:p-3 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all transform hover:scale-110 active:scale-95"
               title={darkMode ? 'Light mode' : 'Dark mode'}
             >
-              {darkMode ? '☀️' : '🌙'}
+              <span className="text-xl">{darkMode ? '☀️' : '🌙'}</span>
             </button>
-            <span className="text-gray-600 dark:text-gray-400">
+            <span className="hidden sm:inline text-gray-600 dark:text-gray-400 text-sm sm:text-base">
               {user?.displayName}
             </span>
             <button
               onClick={() => navigate('/settings')}
-              className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+              className="px-3 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all transform hover:scale-105 active:scale-95"
             >
-              ⚙️ Settings
+              <span className="sm:hidden">⚙️</span>
+              <span className="hidden sm:inline">⚙️ Settings</span>
             </button>
             <button
               onClick={handleLogout}
-              className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+              className="px-3 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all transform hover:scale-105 active:scale-95"
             >
               Logout
             </button>
@@ -122,16 +123,16 @@ const Dashboard = () => {
         </div>
       </nav>
 
-      <div className="max-w-7xl mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-8">
-          <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 sm:mb-8 gap-4">
+          <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white animate-slideIn">
             My Rooms
           </h2>
           <button
             onClick={() => setShowCreateModal(true)}
-            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition duration-200"
+            className="w-full sm:w-auto px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl"
           >
-            Create Room
+            + Create Room
           </button>
         </div>
 
@@ -148,33 +149,43 @@ const Dashboard = () => {
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {rooms.map((room) => (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            {rooms.map((room, index) => (
               <div
                 key={room.id}
-                className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 hover:shadow-lg transition relative group"
+                className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6 hover:shadow-xl transition-all duration-300 relative group transform hover:scale-105 active:scale-100 animate-scaleIn"
+                style={{ animationDelay: `${index * 0.1}s` }}
               >
                 <div
                   className="cursor-pointer"
                   onClick={() => navigate(`/room/${room.phraseCode}`)}
                 >
-                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                  <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white mb-3 pr-8">
                     {room.phraseCode}
                   </h3>
                   <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-                    <p>Max: {room.maxParticipants} participants</p>
-                    {room.hasPassword && <p>🔒 Password protected</p>}
-                    <p className="text-xs">
-                      Created: {new Date(room.createdAt).toLocaleDateString()}
+                    <p className="flex items-center gap-2">
+                      <span>👥</span>
+                      <span>Max: {room.maxParticipants}</span>
+                    </p>
+                    {room.hasPassword && (
+                      <p className="flex items-center gap-2">
+                        <span>🔒</span>
+                        <span>Password protected</span>
+                      </p>
+                    )}
+                    <p className="text-xs flex items-center gap-2">
+                      <span>📅</span>
+                      <span>{new Date(room.createdAt).toLocaleDateString()}</span>
                     </p>
                   </div>
                 </div>
                 <button
                   onClick={(e) => handleDeleteRoom(room.id, room.phraseCode, e)}
-                  className="absolute top-4 right-4 p-2 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 opacity-0 group-hover:opacity-100 transition-opacity"
+                  className="absolute top-3 right-3 p-2 sm:p-3 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-200 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transform hover:scale-110 active:scale-95"
                   title="Delete room"
                 >
-                  🗑️
+                  <span className="text-lg">🗑️</span>
                 </button>
               </div>
             ))}

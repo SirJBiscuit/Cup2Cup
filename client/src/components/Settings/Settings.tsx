@@ -16,8 +16,6 @@ const Settings = () => {
   
   // Profile settings
   const [displayName, setDisplayName] = useState('');
-  const [email, setEmail] = useState('');
-  const [bio, setBio] = useState('');
   const [avatar, setAvatar] = useState('');
   
   // Integration states
@@ -28,6 +26,8 @@ const Settings = () => {
   const [soundEffectsEnabled, setSoundEffectsEnabled] = useState(true);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [autoJoinVoice, setAutoJoinVoice] = useState(true);
+  const [loudnessEqualization, setLoudnessEqualization] = useState(false);
+  const [noiseSuppression, setNoiseSuppression] = useState(true);
 
   useEffect(() => {
     loadUserData();
@@ -47,18 +47,20 @@ const Settings = () => {
       const userData = await authAPI.getCurrentUser();
       setUser(userData);
       setDisplayName(userData.displayName || '');
-      setEmail(userData.email || '');
-      setBio(userData.bio || '');
       setAvatar(userData.avatar || '');
       
       // Load preferences from localStorage
       const savedSoundEffects = localStorage.getItem('soundEffectsEnabled');
       const savedNotifications = localStorage.getItem('notificationsEnabled');
       const savedAutoJoin = localStorage.getItem('autoJoinVoice');
+      const savedLoudness = localStorage.getItem('loudnessEqualization');
+      const savedNoiseSuppression = localStorage.getItem('noiseSuppression');
       
       if (savedSoundEffects !== null) setSoundEffectsEnabled(JSON.parse(savedSoundEffects));
       if (savedNotifications !== null) setNotificationsEnabled(JSON.parse(savedNotifications));
       if (savedAutoJoin !== null) setAutoJoinVoice(JSON.parse(savedAutoJoin));
+      if (savedLoudness !== null) setLoudnessEqualization(JSON.parse(savedLoudness));
+      if (savedNoiseSuppression !== null) setNoiseSuppression(JSON.parse(savedNoiseSuppression));
     } catch (error) {
       console.error('Failed to load user data:', error);
       navigate('/login');
@@ -100,6 +102,8 @@ const Settings = () => {
     localStorage.setItem('soundEffectsEnabled', JSON.stringify(soundEffectsEnabled));
     localStorage.setItem('notificationsEnabled', JSON.stringify(notificationsEnabled));
     localStorage.setItem('autoJoinVoice', JSON.stringify(autoJoinVoice));
+    localStorage.setItem('loudnessEqualization', JSON.stringify(loudnessEqualization));
+    localStorage.setItem('noiseSuppression', JSON.stringify(noiseSuppression));
     alert('Preferences saved!');
   };
 
@@ -190,32 +194,6 @@ const Settings = () => {
                     onChange={(e) => setDisplayName(e.target.value)}
                     className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
                     placeholder="Your display name"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-                    placeholder="your@email.com"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Bio
-                  </label>
-                  <textarea
-                    value={bio}
-                    onChange={(e) => setBio(e.target.value)}
-                    rows={4}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-                    placeholder="Tell us about yourself..."
                   />
                 </div>
 
@@ -430,6 +408,52 @@ const Settings = () => {
                       <span
                         className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${
                           darkMode ? 'translate-x-6' : 'translate-x-1'
+                        }`}
+                      />
+                    </button>
+                  </div>
+
+                  <div className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                    <div>
+                      <h3 className="font-medium text-gray-900 dark:text-white">
+                        🎚️ Loudness Equalization
+                      </h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        Normalize volume levels for users with quiet microphones
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => setLoudnessEqualization(!loudnessEqualization)}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
+                        loudnessEqualization ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'
+                      }`}
+                    >
+                      <span
+                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${
+                          loudnessEqualization ? 'translate-x-6' : 'translate-x-1'
+                        }`}
+                      />
+                    </button>
+                  </div>
+
+                  <div className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                    <div>
+                      <h3 className="font-medium text-gray-900 dark:text-white">
+                        🎙️ Noise Suppression
+                      </h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        Advanced noise cancellation (Discord Krisp-style)
+                      </p>
+                    </div>
+                    <button
+                      onClick={() => setNoiseSuppression(!noiseSuppression)}
+                      className={`relative inline-flex h-6 w-11 items-center rounded-full transition ${
+                        noiseSuppression ? 'bg-blue-600' : 'bg-gray-300 dark:bg-gray-600'
+                      }`}
+                    >
+                      <span
+                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition ${
+                          noiseSuppression ? 'translate-x-6' : 'translate-x-1'
                         }`}
                       />
                     </button>
