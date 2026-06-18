@@ -192,7 +192,7 @@ class WebRTCService {
 
   disconnect(): void {
     // Close all peer connections
-    this.peers.forEach((peerData, socketId) => {
+    this.peers.forEach((_peerData, socketId) => {
       this.removePeer(socketId);
     });
 
