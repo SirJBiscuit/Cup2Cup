@@ -13,7 +13,7 @@ const Dashboard = () => {
   const [maxParticipants, setMaxParticipants] = useState(10);
   const [darkMode, setDarkMode] = useState(() => {
     const saved = localStorage.getItem('darkMode');
-    return saved ? JSON.parse(saved) : true;
+    return saved !== null ? JSON.parse(saved) : true;
   });
   const navigate = useNavigate();
 
@@ -106,6 +106,12 @@ const Dashboard = () => {
             <span className="text-gray-600 dark:text-gray-400">
               {user?.displayName}
             </span>
+            <button
+              onClick={() => navigate('/settings')}
+              className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+            >
+              ⚙️ Settings
+            </button>
             <button
               onClick={handleLogout}
               className="px-4 py-2 text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"

@@ -20,7 +20,7 @@ const VoiceRoom = () => {
   const [micError, setMicError] = useState('');
   const [darkMode, setDarkMode] = useState(() => {
     const saved = localStorage.getItem('darkMode');
-    return saved ? JSON.parse(saved) : true;
+    return saved !== null ? JSON.parse(saved) : true;
   });
 
   useEffect(() => {

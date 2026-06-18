@@ -4,6 +4,7 @@ import Register from './components/Auth/Register';
 import Dashboard from './components/Dashboard/Dashboard';
 import VoiceRoom from './components/Room/VoiceRoom';
 import GuestJoin from './components/Auth/GuestJoin';
+import Settings from './components/Settings/Settings';
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/guest" element={<GuestJoin />} />
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/settings" element={<Settings />} />
           <Route path="/room/:phraseCode" element={<VoiceRoom />} />
         </Routes>
       </div>
