@@ -11,11 +11,24 @@ const Dashboard = () => {
   const [isPersistent, setIsPersistent] = useState(true);
   const [password, setPassword] = useState('');
   const [maxParticipants, setMaxParticipants] = useState(10);
+  const [darkMode, setDarkMode] = useState(() => {
+    const saved = localStorage.getItem('darkMode');
+    return saved ? JSON.parse(saved) : true;
+  });
   const navigate = useNavigate();
 
   useEffect(() => {
     loadDashboard();
   }, []);
+
+  useEffect(() => {
+    localStorage.setItem('darkMode', JSON.stringify(darkMode));
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [darkMode]);
 
   const loadDashboard = async () => {
     try {
@@ -46,6 +59,18 @@ const Dashboard = () => {
     }
   };
 
+  const handleDeleteRoom = async (roomId: number, phraseCode: string, e: any) => {
+    e.stopPropagation();
+    if (!confirm(`Delete room "${phraseCode}"? This cannot be undone.`)) return;
+    
+    try {
+      await roomAPI.deleteRoom(phraseCode);
+      setRooms(rooms.filter((r: Room) => r.id !== roomId));
+    } catch (error: any) {
+      alert(error.response?.data?.error || 'Failed to delete room');
+    }
+  };
+
   const handleLogout = async () => {
     try {
       await authAPI.logout();
@@ -71,6 +96,13 @@ const Dashboard = () => {
             Cup2Cup
           </h1>
           <div className="flex items-center gap-4">
+            <button
+              onClick={() => setDarkMode(!darkMode)}
+              className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+              title={darkMode ? 'Light mode' : 'Dark mode'}
+            >
+              {darkMode ? '☀️' : '🌙'}
+            </button>
             <span className="text-gray-600 dark:text-gray-400">
               {user?.displayName}
             </span>
@@ -114,19 +146,30 @@ const Dashboard = () => {
             {rooms.map((room) => (
               <div
                 key={room.id}
-                className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 hover:shadow-lg transition cursor-pointer"
-                onClick={() => navigate(`/room/${room.phraseCode}`)}
+                className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 hover:shadow-lg transition relative group"
               >
-                <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-                  {room.phraseCode}
-                </h3>
-                <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-                  <p>Max: {room.maxParticipants} participants</p>
-                  {room.hasPassword && <p>🔒 Password protected</p>}
-                  <p className="text-xs">
-                    Created: {new Date(room.createdAt).toLocaleDateString()}
-                  </p>
+                <div
+                  className="cursor-pointer"
+                  onClick={() => navigate(`/room/${room.phraseCode}`)}
+                >
+                  <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+                    {room.phraseCode}
+                  </h3>
+                  <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+                    <p>Max: {room.maxParticipants} participants</p>
+                    {room.hasPassword && <p>🔒 Password protected</p>}
+                    <p className="text-xs">
+                      Created: {new Date(room.createdAt).toLocaleDateString()}
+                    </p>
+                  </div>
                 </div>
+                <button
+                  onClick={(e) => handleDeleteRoom(room.id, room.phraseCode, e)}
+                  className="absolute top-4 right-4 p-2 text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 opacity-0 group-hover:opacity-100 transition-opacity"
+                  title="Delete room"
+                >
+                  🗑️
+                </button>
               </div>
             ))}
           </div>

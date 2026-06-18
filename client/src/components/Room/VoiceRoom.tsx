@@ -18,6 +18,19 @@ const VoiceRoom = () => {
   const [connected, setConnected] = useState(false);
   const [voiceEnabled, setVoiceEnabled] = useState(false);
   const [micError, setMicError] = useState('');
+  const [darkMode, setDarkMode] = useState(() => {
+    const saved = localStorage.getItem('darkMode');
+    return saved ? JSON.parse(saved) : true;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('darkMode', JSON.stringify(darkMode));
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [darkMode]);
 
   useEffect(() => {
     const isGuest = searchParams.get('guest') === 'true';
@@ -35,15 +48,21 @@ const VoiceRoom = () => {
       setParticipants(data.participants);
       soundService.play('join');
       
-      // Initialize LiveKit after joining room
+      // Initialize LiveKit after joining room (optional - graceful degradation)
       try {
         const displayName = isGuest && guestName ? decodeURIComponent(guestName) : 'User';
         await livekitService.connect(phraseCode!, displayName);
         await livekitService.enableMicrophone();
         setVoiceEnabled(true);
+        setMicError(''); // Clear any previous errors
       } catch (error: any) {
-        setMicError(error.message || 'Failed to connect to voice chat');
-        console.error('LiveKit error:', error);
+        // Voice chat unavailable - continue with text chat only
+        const errorMsg = error.response?.status === 503 
+          ? 'Voice chat temporarily unavailable. Chat still works!' 
+          : 'Voice chat unavailable. Using text chat only.';
+        setMicError(errorMsg);
+        console.warn('Voice chat not available:', error);
+        setVoiceEnabled(false);
       }
     });
 
@@ -86,7 +105,8 @@ const VoiceRoom = () => {
   };
 
   const handleLeaveRoom = () => {
-    navigate('/');
+    const token = localStorage.getItem('token');
+    navigate(token ? '/dashboard' : '/');
   };
 
   const handleMuteToggle = async () => {
@@ -111,20 +131,29 @@ const VoiceRoom = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white">
-      <div className="bg-gray-800 border-b border-gray-700 px-6 py-4 flex justify-between items-center">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white">
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold">Room: {phraseCode}</h1>
-          <p className="text-sm text-gray-400">
+          <p className="text-sm text-gray-600 dark:text-gray-400">
             {connected ? `${participants.length} participant${participants.length !== 1 ? 's' : ''}` : 'Connecting...'}
           </p>
         </div>
-        <button
-          onClick={handleLeaveRoom}
-          className="px-4 py-2 bg-red-600 hover:bg-red-700 rounded-lg transition"
-        >
-          Leave Room
-        </button>
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => setDarkMode(!darkMode)}
+            className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+            title={darkMode ? 'Light mode' : 'Dark mode'}
+          >
+            {darkMode ? '☀️' : '🌙'}
+          </button>
+          <button
+            onClick={handleLeaveRoom}
+            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition"
+          >
+            Leave Room
+          </button>
+        </div>
       </div>
 
       <div className="flex h-[calc(100vh-73px)]">
