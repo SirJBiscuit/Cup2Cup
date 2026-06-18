@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import socketService from '../../services/socket';
-import webrtcService from '../../services/webrtc';
+import livekitService from '../../services/livekit';
 import type { Participant, ChatMessage } from '../../types';
 
 const VoiceRoom = () => {
@@ -33,59 +33,24 @@ const VoiceRoom = () => {
       setConnected(true);
       setParticipants(data.participants);
       
-      // Initialize WebRTC after joining room
+      // Initialize LiveKit after joining room
       try {
-        await webrtcService.initialize();
+        const displayName = isGuest && guestName ? decodeURIComponent(guestName) : 'User';
+        await livekitService.connect(phraseCode!, displayName);
+        await livekitService.enableMicrophone();
         setVoiceEnabled(true);
-        
-        // Create offers to existing participants
-        data.participants.forEach((participant) => {
-          if (participant.socketId !== socket.id) {
-            webrtcService.createOffer(participant.socketId);
-          }
-        });
       } catch (error: any) {
-        setMicError(error.message || 'Failed to access microphone');
-        console.error('Microphone error:', error);
+        setMicError(error.message || 'Failed to connect to voice chat');
+        console.error('LiveKit error:', error);
       }
     });
 
     socketService.onRoomParticipants((data) => {
-      const oldParticipants = participants;
       setParticipants(data.participants);
-      
-      // Handle new participants
-      data.participants.forEach((participant) => {
-        const isNew = !oldParticipants.find(p => p.socketId === participant.socketId);
-        if (isNew && participant.socketId !== socket.id && voiceEnabled) {
-          webrtcService.createOffer(participant.socketId);
-        }
-      });
-      
-      // Handle removed participants
-      oldParticipants.forEach((oldParticipant) => {
-        const stillPresent = data.participants.find(p => p.socketId === oldParticipant.socketId);
-        if (!stillPresent) {
-          webrtcService.removePeer(oldParticipant.socketId);
-        }
-      });
     });
 
     socketService.onChatMessage((message) => {
       setChatMessages((prev) => [...prev, message]);
-    });
-
-    // WebRTC signaling handlers
-    socketService.onOffer(({ offer, fromSocketId }) => {
-      webrtcService.handleOffer(fromSocketId, offer);
-    });
-
-    socketService.onAnswer(({ answer, fromSocketId }) => {
-      webrtcService.handleAnswer(fromSocketId, answer);
-    });
-
-    socketService.onICECandidate(({ candidate, fromSocketId }) => {
-      webrtcService.handleIceCandidate(fromSocketId, candidate);
     });
 
     socketService.onError((error) => {
@@ -95,10 +60,10 @@ const VoiceRoom = () => {
 
     return () => {
       socket.emit('leave-room', { phraseCode });
-      webrtcService.disconnect();
+      livekitService.disconnect();
       socketService.disconnect();
     };
-  }, [phraseCode, searchParams, navigate, participants, voiceEnabled]);
+  }, [phraseCode, searchParams, navigate]);
 
   const handleSendMessage = (e: any) => {
     e.preventDefault();
@@ -112,20 +77,20 @@ const VoiceRoom = () => {
     navigate('/');
   };
 
-  const handleMuteToggle = () => {
-    if (isMuted) {
-      webrtcService.unmute();
-    } else {
-      webrtcService.mute();
+  const handleMuteToggle = async () => {
+    try {
+      const newMutedState = await livekitService.toggleMicrophone();
+      setIsMuted(!newMutedState);
+    } catch (error) {
+      console.error('Failed to toggle microphone:', error);
     }
-    setIsMuted(!isMuted);
   };
 
   const handleDeafenToggle = () => {
     if (isDeafened) {
-      webrtcService.undeafen();
+      livekitService.unmuteAllRemote();
     } else {
-      webrtcService.deafen();
+      livekitService.muteAllRemote();
     }
     setIsDeafened(!isDeafened);
   };
