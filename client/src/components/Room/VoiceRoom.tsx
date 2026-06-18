@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import socketService from '../../services/socket';
 import livekitService from '../../services/livekit';
+import soundService from '../../services/sounds';
 import type { Participant, ChatMessage } from '../../types';
 
 const VoiceRoom = () => {
@@ -32,6 +33,7 @@ const VoiceRoom = () => {
     socketService.onJoinedRoom(async (data) => {
       setConnected(true);
       setParticipants(data.participants);
+      soundService.play('join');
       
       // Initialize LiveKit after joining room
       try {
@@ -46,11 +48,21 @@ const VoiceRoom = () => {
     });
 
     socketService.onRoomParticipants((data) => {
+      const oldCount = participants.length;
+      const newCount = data.participants.length;
+      
+      if (newCount > oldCount) {
+        soundService.play('join');
+      } else if (newCount < oldCount) {
+        soundService.play('leave');
+      }
+      
       setParticipants(data.participants);
     });
 
     socketService.onChatMessage((message) => {
-      setChatMessages((prev) => [...prev, message]);
+      setChatMessages((prev: ChatMessage[]) => [...prev, message]);
+      soundService.play('message');
     });
 
     socketService.onError((error) => {
@@ -81,6 +93,7 @@ const VoiceRoom = () => {
     try {
       const newMutedState = await livekitService.toggleMicrophone();
       setIsMuted(!newMutedState);
+      soundService.play(newMutedState ? 'unmute' : 'mute');
     } catch (error) {
       console.error('Failed to toggle microphone:', error);
     }
@@ -89,8 +102,10 @@ const VoiceRoom = () => {
   const handleDeafenToggle = () => {
     if (isDeafened) {
       livekitService.unmuteAllRemote();
+      soundService.play('undeafen');
     } else {
       livekitService.muteAllRemote();
+      soundService.play('deafen');
     }
     setIsDeafened(!isDeafened);
   };
