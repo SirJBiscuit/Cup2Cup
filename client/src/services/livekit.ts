@@ -96,7 +96,7 @@ class LiveKitService {
 
   onTrackSubscribed(callback: (track: Track, participant: RemoteParticipant) => void): void {
     if (this.room) {
-      this.room.on(RoomEvent.TrackSubscribed, (track, publication, participant) => {
+      this.room.on(RoomEvent.TrackSubscribed, (track, _publication, participant) => {
         callback(track, participant);
       });
     }
