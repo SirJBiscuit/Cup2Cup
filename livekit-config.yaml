@@ -20,6 +20,4 @@ logging:
   level: info
   
 turn:
-  enabled: true
-  domain: cup2cup.xyz
-  tls_port: 5349
+  enabled: false
