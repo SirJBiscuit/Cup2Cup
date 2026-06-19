@@ -187,6 +187,7 @@ router.get('/me', authenticateToken, async (req, res) => {
     const result = await query(
       `SELECT u.id, u.username, u.display_name, u.created_at,
               u.soundcloud_connected, u.spotify_connected,
+              u.is_admin, u.admin_level,
               p.theme, p.preferred_music_service
        FROM users u
        LEFT JOIN user_preferences p ON p.user_id = u.id

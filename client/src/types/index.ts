@@ -6,6 +6,8 @@ export interface User {
   spotifyConnected?: boolean;
   theme?: 'dark' | 'light';
   preferredMusicService?: 'soundcloud' | 'spotify';
+  isAdmin?: boolean;
+  adminLevel?: number;
 }
 
 export interface Room {
