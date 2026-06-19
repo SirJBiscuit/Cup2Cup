@@ -118,6 +118,14 @@ const Login = () => {
               Join as Guest
             </Link>
           </p>
+          <p className="text-gray-600 dark:text-gray-400 pt-2 border-t border-gray-200 dark:border-gray-700">
+            <Link
+              to="/admin"
+              className="text-purple-600 dark:text-purple-400 hover:underline font-medium"
+            >
+              🔐 Admin Login
+            </Link>
+          </p>
         </div>
       </div>
     </div>
