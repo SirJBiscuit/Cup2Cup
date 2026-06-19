@@ -61,6 +61,10 @@ app.use('/api/music', musicRoutes);
 import livekitRoutes from './routes/livekit.js';
 app.use('/api/livekit', livekitRoutes);
 
+// Admin routes
+import adminRoutes from './routes/admin.js';
+app.use('/api/admin', adminRoutes);
+
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });

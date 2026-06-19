@@ -5,6 +5,7 @@ import Dashboard from './components/Dashboard/Dashboard';
 import VoiceRoom from './components/Room/VoiceRoom';
 import GuestJoin from './components/Auth/GuestJoin';
 import Settings from './components/Settings/Settings';
+import AdminPanel from './components/Admin/AdminPanel';
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
           <Route path="/guest" element={<GuestJoin />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/admin" element={<AdminPanel />} />
           <Route path="/room/:phraseCode" element={<VoiceRoom />} />
         </Routes>
       </div>

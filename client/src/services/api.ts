@@ -103,4 +103,50 @@ export const roomAPI = {
   },
 };
 
+export const adminAPI = {
+  getStats: async () => {
+    const { data } = await api.get('/admin/stats');
+    return data;
+  },
+
+  getDeployments: async () => {
+    const { data } = await api.get('/admin/deployments');
+    return data;
+  },
+
+  deploy: async (branch = 'main') => {
+    const { data } = await api.post('/admin/system/deploy', { branch });
+    return data;
+  },
+
+  restart: async () => {
+    const { data } = await api.post('/admin/system/restart');
+    return data;
+  },
+
+  createBackup: async () => {
+    const { data } = await api.post('/admin/system/backup');
+    return data;
+  },
+
+  rollback: async (deploymentId: string) => {
+    const { data } = await api.post(`/admin/system/rollback/${deploymentId}`);
+    return data;
+  },
+
+  getUsers: async () => {
+    const { data } = await api.get('/admin/users');
+    return data;
+  },
+
+  updateUser: async (userId: string, updates: any) => {
+    const { data } = await api.patch(`/admin/users/${userId}`, updates);
+    return data;
+  },
+
+  deleteUser: async (userId: string) => {
+    await api.delete(`/admin/users/${userId}`);
+  },
+};
+
 export default api;
