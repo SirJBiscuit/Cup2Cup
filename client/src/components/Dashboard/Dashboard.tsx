@@ -59,7 +59,7 @@ const Dashboard = () => {
     }
   };
 
-  const handleDeleteRoom = async (roomId: number, phraseCode: string, e: any) => {
+  const handleDeleteRoom = async (roomId: string, phraseCode: string, e: any) => {
     e.stopPropagation();
     if (!window.confirm(`Delete room "${phraseCode}"? This cannot be undone.`)) return;
     
