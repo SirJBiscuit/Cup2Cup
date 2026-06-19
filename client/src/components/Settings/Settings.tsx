@@ -14,7 +14,6 @@ const Settings = () => {
   
   // Profile settings
   const [displayName, setDisplayName] = useState('');
-  const [avatar, setAvatar] = useState('');
   
   // Integration states
   const [spotifyConnected, setSpotifyConnected] = useState(false);
@@ -44,7 +43,6 @@ const Settings = () => {
     try {
       const userData = await authAPI.getCurrentUser();
       setDisplayName(userData.displayName || '');
-      setAvatar(userData.avatar || '');
       
       // Load preferences from localStorage
       const savedSoundEffects = localStorage.getItem('soundEffectsEnabled');
@@ -194,25 +192,6 @@ const Settings = () => {
                   />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                    Avatar URL
-                  </label>
-                  <input
-                    type="url"
-                    value={avatar}
-                    onChange={(e) => setAvatar(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
-                    placeholder="https://example.com/avatar.jpg"
-                  />
-                  {avatar && (
-                    <img
-                      src={avatar}
-                      alt="Avatar preview"
-                      className="mt-2 w-20 h-20 rounded-full object-cover"
-                    />
-                  )}
-                </div>
 
                 <button
                   onClick={handleSaveProfile}
