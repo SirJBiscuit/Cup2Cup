@@ -105,7 +105,7 @@ const VoiceRoom = () => {
   };
 
   const handleLeaveRoom = () => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('accessToken');
     navigate(token ? '/dashboard' : '/');
   };
 
