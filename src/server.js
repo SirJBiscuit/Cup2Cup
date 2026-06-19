@@ -48,11 +48,7 @@ const limiter = rateLimit({
   max: 100,
   standardHeaders: true,
   legacyHeaders: false,
-  // Skip rate limiting for trusted proxies
-  skip: (req) => {
-    // Skip if no X-Forwarded-For header
-    return !req.headers['x-forwarded-for'];
-  },
+  validate: { trustProxy: false }, // Disable trust proxy validation
 });
 app.use('/api/', limiter);
 
