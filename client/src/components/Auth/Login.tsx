@@ -46,13 +46,13 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600 px-4 py-8 animate-fadeIn">
-      <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 sm:p-8 animate-scaleIn">
+    <div className="dark min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600 px-4 py-8 animate-fadeIn">
+      <div className="max-w-md w-full bg-gray-800 rounded-lg shadow-xl p-6 sm:p-8 animate-scaleIn">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
+          <h1 className="text-4xl font-bold text-white mb-2">
             Cup2Cup
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-gray-400">
             High-quality voice chat platform
           </p>
         </div>
@@ -61,7 +61,7 @@ const Login = () => {
           <div>
             <label
               htmlFor="username"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              className="block text-sm font-medium text-gray-300 mb-2"
             >
               Username
             </label>
@@ -71,7 +71,7 @@ const Login = () => {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+              className="w-full px-4 py-2 border border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-700 text-white"
               placeholder="Enter your username"
             />
           </div>
@@ -79,7 +79,7 @@ const Login = () => {
           <div>
             <label
               htmlFor="password"
-              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+              className="block text-sm font-medium text-gray-300 mb-2"
             >
               Password
             </label>
@@ -96,7 +96,7 @@ const Login = () => {
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 p-1 rounded transition-all transform hover:scale-110 active:scale-95"
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-200 p-1 rounded transition-all transform hover:scale-110 active:scale-95"
                 title={showPassword ? 'Hide password' : 'Show password'}
               >
                 <span className="text-lg">{showPassword ? '🙈' : '👁️'}</span>
@@ -105,7 +105,7 @@ const Login = () => {
           </div>
 
           {error && (
-            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-lg">
+            <div className="bg-red-900/20 border border-red-800 text-red-400 px-4 py-3 rounded-lg">
               {error}
             </div>
           )}
@@ -120,28 +120,28 @@ const Login = () => {
         </form>
 
         <div className="mt-6 text-center space-y-2">
-          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
+          <p className="text-sm sm:text-base text-gray-400">
             Don't have an account?{' '}
             <Link
               to="/register"
-              className="text-blue-600 dark:text-blue-400 hover:underline font-medium"
+              className="text-blue-400 hover:underline font-medium"
             >
               Register
             </Link>
           </p>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-gray-400">
             or{' '}
             <Link
               to="/guest"
-              className="text-blue-600 dark:text-blue-400 hover:underline font-medium"
+              className="text-blue-400 hover:underline font-medium"
             >
               Join as Guest
             </Link>
           </p>
-          <p className="text-gray-600 dark:text-gray-400 pt-2 border-t border-gray-200 dark:border-gray-700">
+          <p className="text-gray-400 pt-2 border-t border-gray-700">
             <button
               onClick={() => setShowAdminModal(true)}
-              className="text-purple-600 dark:text-purple-400 hover:underline font-medium"
+              className="text-purple-400 hover:underline font-medium"
             >
               🔐 Admin Login
             </button>
@@ -152,12 +152,12 @@ const Login = () => {
       {/* Admin Login Modal */}
       {showAdminModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-2xl p-6 sm:p-8 max-w-md w-full animate-scaleIn">
+          <div className="bg-gray-800 rounded-lg shadow-2xl p-6 sm:p-8 max-w-md w-full animate-scaleIn">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-gray-800 dark:text-white">🔐 Admin Login</h2>
+              <h2 className="text-2xl font-bold text-white">🔐 Admin Login</h2>
               <button
                 onClick={() => setShowAdminModal(false)}
-                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-2xl"
+                className="text-gray-400 hover:text-gray-200 text-2xl"
               >
                 ×
               </button>
@@ -165,34 +165,34 @@ const Login = () => {
 
             <form onSubmit={handleAdminLogin} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Admin Username
                 </label>
                 <input
                   type="text"
                   value={adminUsername}
                   onChange={(e) => setAdminUsername(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
+                  className="w-full px-4 py-3 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 bg-gray-700 text-white"
                   required
                   autoFocus
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Admin Password
                 </label>
                 <input
                   type="password"
                   value={adminPassword}
                   onChange={(e) => setAdminPassword(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-700 dark:text-white"
+                  className="w-full px-4 py-3 border border-gray-600 rounded-lg focus:ring-2 focus:ring-purple-500 bg-gray-700 text-white"
                   required
                 />
               </div>
 
               {adminError && (
-                <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-lg">
+                <div className="bg-red-900/20 border border-red-800 text-red-400 px-4 py-3 rounded-lg">
                   {adminError}
                 </div>
               )}
