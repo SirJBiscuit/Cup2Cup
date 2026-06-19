@@ -143,9 +143,21 @@ fi
 echo "📦 Installing livekit-server-sdk..."
 npm install livekit-server-sdk
 
+# Approve bcrypt install scripts if needed
+if command -v npm-approve-scripts &> /dev/null; then
+  npm approve-scripts bcrypt || true
+fi
+
 # Restart backend
 echo "🔄 Restarting backend..."
-pm2 restart cup2cup-backend
+if pm2 list | grep -q "cup2cup"; then
+  pm2 restart all
+  echo "✅ Backend restarted"
+else
+  echo "⚠️  PM2 process not found. Please start your backend manually:"
+  echo "   cd /var/www/cup2cup"
+  echo "   pm2 start src/server.js --name cup2cup-backend"
+fi
 
 echo ""
 echo "✅ LiveKit Setup Complete!"
