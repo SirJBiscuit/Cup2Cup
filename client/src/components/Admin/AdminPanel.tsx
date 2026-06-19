@@ -49,7 +49,7 @@ const AdminPanel: React.FC = () => {
   };
 
   const handleDeploy = async () => {
-    if (!confirm('⚠️ This will update the server. A backup will be created automatically. Continue?')) {
+    if (!window.confirm('⚠️ This will update the server. A backup will be created automatically. Continue?')) {
       return;
     }
 
@@ -69,7 +69,7 @@ const AdminPanel: React.FC = () => {
   };
 
   const handleRestart = async () => {
-    if (!confirm('⚠️ This will restart the server. Continue?')) {
+    if (!window.confirm('⚠️ This will restart the server. Continue?')) {
       return;
     }
 
@@ -103,7 +103,7 @@ const AdminPanel: React.FC = () => {
   };
 
   const handleRollback = async (deploymentId: string) => {
-    if (!confirm('⚠️ This will rollback to a previous version. Continue?')) {
+    if (!window.confirm('⚠️ This will rollback to a previous version. Continue?')) {
       return;
     }
 
