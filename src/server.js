@@ -36,6 +36,9 @@ app.use(cors({
   credentials: true,
 }));
 
+// Trust proxy for nginx
+app.set('trust proxy', true);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
