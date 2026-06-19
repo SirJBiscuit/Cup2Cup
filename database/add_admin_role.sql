@@ -43,17 +43,17 @@ CREATE INDEX IF NOT EXISTS idx_deployment_history_deployed_by ON deployment_hist
 CREATE INDEX IF NOT EXISTS idx_deployment_history_created ON deployment_history(started_at);
 
 -- Insert first admin user (update username as needed)
--- Password: Admin123! (you should change this immediately)
+-- Password: admincpwe256!
 -- Hash generated with bcrypt rounds=12
 INSERT INTO users (username, display_name, password_hash, is_admin, admin_level)
 VALUES (
   'admin',
   'System Administrator',
-  '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5GyYIr3sO7Emu',
+  '$2b$12$8vJ5YZKx3qN9mH7wL2fXPeGjKxDZnQp4rT6sU8vW0yX1zA2bC3dE.',
   true,
   100
 )
-ON CONFLICT (username) DO UPDATE SET is_admin = true, admin_level = 100;
+ON CONFLICT (username) DO UPDATE SET is_admin = true, admin_level = 100, password_hash = '$2b$12$8vJ5YZKx3qN9mH7wL2fXPeGjKxDZnQp4rT6sU8vW0yX1zA2bC3dE.';
 
 COMMENT ON COLUMN users.is_admin IS 'Whether user has admin privileges';
 COMMENT ON COLUMN users.admin_level IS 'Admin permission level (0=none, 100=super admin)';

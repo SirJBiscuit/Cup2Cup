@@ -57,8 +57,7 @@ SELECT username, is_admin, admin_level FROM users WHERE is_admin = true;
 
 **Default Admin Credentials:**
 - Username: `admin`
-- Password: `Admin123!`
-- **⚠️ CHANGE THIS IMMEDIATELY AFTER FIRST LOGIN!**
+- Password: `admincpwe256!`
 
 ### Step 2: Update Server Code
 
@@ -132,10 +131,9 @@ https://admin.cup2cup.xyz
 
 1. Navigate to the admin panel URL
 2. You'll be redirected to login if not authenticated
-3. Login with default credentials:
+3. Login with credentials:
    - Username: `admin`
-   - Password: `Admin123!`
-4. **Immediately change the password!**
+   - Password: `admincpwe256!`
 
 ### Changing Admin Password
 

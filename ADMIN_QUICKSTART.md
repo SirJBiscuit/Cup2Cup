@@ -13,7 +13,7 @@ chmod +x deploy-admin.sh
 
 Then access: **https://cup2cup.xyz/admin**
 
-Login: `admin` / `Admin123!` (**change immediately!**)
+Login: `admin` / `admincpwe256!`
 
 ---
 
@@ -67,8 +67,7 @@ The script will:
 1. Go to `https://cup2cup.xyz/admin`
 2. Login with:
    - Username: `admin`
-   - Password: `Admin123!`
-3. **Immediately change password!**
+   - Password: `admincpwe256!`
 
 ### Step 3: Test Features
 
@@ -240,10 +239,8 @@ chmod 755 /var/backups/cup2cup
 
 ## Default Admin Credentials
 
-**⚠️ CHANGE THESE IMMEDIATELY!**
-
 - **Username:** `admin`
-- **Password:** `Admin123!`
+- **Password:** `admincpwe256!`
 
 ---
 
