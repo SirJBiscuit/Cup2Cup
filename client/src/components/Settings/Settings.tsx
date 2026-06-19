@@ -1,11 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authAPI } from '../../services/api';
-import type { User } from '../../types';
 
 const Settings = () => {
   const navigate = useNavigate();
-  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const [darkMode, setDarkMode] = useState(() => {
     const saved = localStorage.getItem('darkMode');
@@ -45,7 +43,6 @@ const Settings = () => {
   const loadUserData = async () => {
     try {
       const userData = await authAPI.getCurrentUser();
-      setUser(userData);
       setDisplayName(userData.displayName || '');
       setAvatar(userData.avatar || '');
       
