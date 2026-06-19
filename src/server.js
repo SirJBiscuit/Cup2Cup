@@ -43,6 +43,13 @@ app.use(cookieParser());
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 100,
+  standardHeaders: true,
+  legacyHeaders: false,
+  // Skip rate limiting for trusted proxies
+  skip: (req) => {
+    // Skip if no X-Forwarded-For header
+    return !req.headers['x-forwarded-for'];
+  },
 });
 app.use('/api/', limiter);
 
