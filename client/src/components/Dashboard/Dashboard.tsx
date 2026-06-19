@@ -61,7 +61,7 @@ const Dashboard = () => {
 
   const handleDeleteRoom = async (roomId: number, phraseCode: string, e: any) => {
     e.stopPropagation();
-    if (!confirm(`Delete room "${phraseCode}"? This cannot be undone.`)) return;
+    if (!window.confirm(`Delete room "${phraseCode}"? This cannot be undone.`)) return;
     
     try {
       await roomAPI.deleteRoom(phraseCode);
