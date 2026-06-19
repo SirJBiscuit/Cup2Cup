@@ -27,8 +27,14 @@ const AdminPanel: React.FC = () => {
   const [error, setError] = useState('');
 
   useEffect(() => {
+    // Check if user is logged in
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/login');
+      return;
+    }
     loadData();
-  }, []);
+  }, [navigate]);
 
   const loadData = async () => {
     try {
@@ -39,9 +45,9 @@ const AdminPanel: React.FC = () => {
       setStats(statsData.stats);
       setDeployments(deploymentsData.deployments);
     } catch (err: any) {
-      if (err.response?.status === 403) {
-        setError('Admin access required');
-        setTimeout(() => navigate('/dashboard'), 2000);
+      if (err.response?.status === 403 || err.response?.status === 401) {
+        setError('Admin access required. Redirecting to login...');
+        setTimeout(() => navigate('/login'), 2000);
       } else {
         setError('Failed to load admin data');
       }
