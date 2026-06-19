@@ -106,15 +106,6 @@ const Dashboard = () => {
             <span className="hidden sm:inline text-gray-600 dark:text-gray-400 text-sm sm:text-base">
               {user?.displayName}
             </span>
-            {user?.isAdmin && (
-              <button
-                onClick={() => navigate('/admin')}
-                className="px-3 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-all transform hover:scale-105 active:scale-95 font-semibold"
-              >
-                <span className="sm:hidden">🛠️</span>
-                <span className="hidden sm:inline">🛠️ Admin</span>
-              </button>
-            )}
             <button
               onClick={() => navigate('/settings')}
               className="px-3 py-2 sm:px-4 sm:py-2 text-xs sm:text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all transform hover:scale-105 active:scale-95"
@@ -137,12 +128,22 @@ const Dashboard = () => {
           <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white animate-slideIn">
             My Rooms
           </h2>
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="w-full sm:w-auto px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl"
-          >
-            + Create Room
-          </button>
+          <div className="flex gap-3 w-full sm:w-auto">
+            {user?.isAdmin && (
+              <button
+                onClick={() => navigate('/admin')}
+                className="flex-1 sm:flex-initial px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl"
+              >
+                🛠️ Admin Panel
+              </button>
+            )}
+            <button
+              onClick={() => setShowCreateModal(true)}
+              className="flex-1 sm:flex-initial px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl"
+            >
+              + Create Room
+            </button>
+          </div>
         </div>
 
         {rooms.length === 0 ? (
