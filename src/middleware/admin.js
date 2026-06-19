@@ -3,13 +3,13 @@ import { query } from '../config/database.js';
 // Middleware to check if user is admin
 export const requireAdmin = async (req, res, next) => {
   try {
-    if (!req.userId) {
+    if (!req.user || !req.user.id) {
       return res.status(401).json({ error: 'Authentication required' });
     }
 
     const result = await query(
       'SELECT is_admin, admin_level FROM users WHERE id = $1',
-      [req.userId]
+      [req.user.id]
     );
 
     if (result.rows.length === 0) {
