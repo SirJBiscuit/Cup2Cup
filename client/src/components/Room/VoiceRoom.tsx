@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import socketService from '../../services/socket';
-import livekitService from '../../services/livekit';
 import soundService from '../../services/sounds';
+import JitsiVoice from './JitsiVoice';
 import type { Participant, ChatMessage } from '../../types';
 
 const VoiceRoom = () => {
@@ -13,8 +13,6 @@ const VoiceRoom = () => {
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [chatInput, setChatInput] = useState('');
-  const [isMuted, setIsMuted] = useState(false);
-  const [isDeafened, setIsDeafened] = useState(false);
   const [connected, setConnected] = useState(false);
   const [voiceEnabled, setVoiceEnabled] = useState(false);
   const [micError, setMicError] = useState('');
@@ -48,22 +46,8 @@ const VoiceRoom = () => {
       setParticipants(data.participants);
       soundService.play('join');
       
-      // Initialize LiveKit after joining room (optional - graceful degradation)
-      try {
-        const displayName = isGuest && guestName ? decodeURIComponent(guestName) : 'User';
-        await livekitService.connect(phraseCode!, displayName);
-        await livekitService.enableMicrophone();
-        setVoiceEnabled(true);
-        setMicError(''); // Clear any previous errors
-      } catch (error: any) {
-        // Voice chat unavailable - continue with text chat only
-        const errorMsg = error.response?.status === 503 
-          ? 'Voice chat temporarily unavailable. Chat still works!' 
-          : 'Voice chat unavailable. Using text chat only.';
-        setMicError(errorMsg);
-        console.warn('Voice chat not available:', error);
-        setVoiceEnabled(false);
-      }
+      // Voice chat is now handled by Jitsi component
+      setVoiceEnabled(true);
     });
 
     socketService.onRoomParticipants((data) => {
@@ -91,7 +75,6 @@ const VoiceRoom = () => {
 
     return () => {
       socket.emit('leave-room', { phraseCode });
-      livekitService.disconnect();
       socketService.disconnect();
     };
   }, [phraseCode, searchParams, navigate]);
@@ -107,27 +90,6 @@ const VoiceRoom = () => {
   const handleLeaveRoom = () => {
     const token = localStorage.getItem('accessToken');
     navigate(token ? '/dashboard' : '/');
-  };
-
-  const handleMuteToggle = async () => {
-    try {
-      const newMutedState = await livekitService.toggleMicrophone();
-      setIsMuted(!newMutedState);
-      soundService.play(newMutedState ? 'unmute' : 'mute');
-    } catch (error) {
-      console.error('Failed to toggle microphone:', error);
-    }
-  };
-
-  const handleDeafenToggle = () => {
-    if (isDeafened) {
-      livekitService.unmuteAllRemote();
-      soundService.play('undeafen');
-    } else {
-      livekitService.muteAllRemote();
-      soundService.play('deafen');
-    }
-    setIsDeafened(!isDeafened);
   };
 
   return (
@@ -195,7 +157,7 @@ const VoiceRoom = () => {
             </div>
 
             <div className="mt-6 pt-6 border-t border-gray-700">
-              <h3 className="text-lg font-semibold mb-3">Audio Controls</h3>
+              <h3 className="text-lg font-semibold mb-3">Voice Chat</h3>
               
               {micError && (
                 <div className="mb-3 bg-red-900/20 border border-red-800 text-red-400 px-4 py-2 rounded-lg text-sm">
@@ -203,36 +165,22 @@ const VoiceRoom = () => {
                 </div>
               )}
               
-              {voiceEnabled && (
-                <div className="mb-3 bg-green-900/20 border border-green-800 text-green-400 px-4 py-2 rounded-lg text-sm">
-                  🎤 Voice chat active
+              {voiceEnabled && connected && phraseCode && (
+                <div className="h-96 bg-gray-900 rounded-lg overflow-hidden">
+                  <JitsiVoice
+                    roomName={`cup2cup-${phraseCode}`}
+                    displayName={searchParams.get('name') ? decodeURIComponent(searchParams.get('name')!) : 'User'}
+                    onReady={() => {
+                      console.log('Jitsi voice chat ready');
+                      setMicError('');
+                    }}
+                    onError={(error) => {
+                      console.error('Jitsi error:', error);
+                      setMicError('Voice chat connection failed');
+                    }}
+                  />
                 </div>
               )}
-              
-              <div className="flex gap-3">
-                <button
-                  onClick={handleMuteToggle}
-                  disabled={!voiceEnabled}
-                  className={`flex-1 py-3 px-4 rounded-lg font-medium transition ${
-                    isMuted
-                      ? 'bg-red-600 hover:bg-red-700'
-                      : 'bg-gray-700 hover:bg-gray-600'
-                  } disabled:opacity-50 disabled:cursor-not-allowed`}
-                >
-                  {isMuted ? '🔇 Unmute' : '🎤 Mute'}
-                </button>
-                <button
-                  onClick={handleDeafenToggle}
-                  disabled={!voiceEnabled}
-                  className={`flex-1 py-3 px-4 rounded-lg font-medium transition ${
-                    isDeafened
-                      ? 'bg-red-600 hover:bg-red-700'
-                      : 'bg-gray-700 hover:bg-gray-600'
-                  } disabled:opacity-50 disabled:cursor-not-allowed`}
-                >
-                  {isDeafened ? '🔇 Undeafen' : '🔊 Deafen'}
-                </button>
-              </div>
             </div>
           </div>
         </div>
