@@ -5,7 +5,7 @@ rtc:
   use_external_ip: true
   
 redis:
-  address: localhost:6379
+  address: host.docker.internal:6379
   
 keys:
   APIKey: Fw1xtxVPRex+P1CZQtbJnEkXEB+HpWIuNsP0f6RhNTk=
