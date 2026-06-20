@@ -1,5 +1,5 @@
 import { query } from '../config/database.js';
-import { redisClient } from '../config/redis.js';
+import redis from '../config/redis.js';
 
 const EMPTY_ROOM_TIMEOUT = 5 * 60 * 1000; // 5 minutes in milliseconds
 const CLEANUP_INTERVAL = 60 * 1000; // Run every minute
@@ -61,7 +61,7 @@ class RoomCleanupService {
 
   async getParticipantCount(phraseCode) {
     try {
-      const participants = await redisClient.sMembers(`room:${phraseCode}:participants`);
+      const participants = await redis.smembers(`room:${phraseCode}:participants`);
       return participants.length;
     } catch (error) {
       console.error(`Error getting participant count for ${phraseCode}:`, error);
@@ -80,8 +80,8 @@ class RoomCleanupService {
       );
 
       // Clean up Redis data
-      await redisClient.del(`room:${room.phrase_code}:participants`);
-      await redisClient.del(`room:${room.phrase_code}:messages`);
+      await redis.del(`room:${room.phrase_code}:participants`);
+      await redis.del(`room:${room.phrase_code}:messages`);
 
       // Remove from tracking
       this.emptyRoomTimestamps.delete(room.id);
