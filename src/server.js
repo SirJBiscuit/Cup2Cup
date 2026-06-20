@@ -13,6 +13,7 @@ import authRoutes from './routes/auth.js';
 import roomRoutes from './routes/rooms.js';
 import musicRoutes from './routes/music.js';
 import { setupSocketHandlers } from './socket/index.js';
+import roomCleanupService from './services/roomCleanup.js';
 
 dotenv.config();
 
@@ -78,6 +79,9 @@ async function startServer() {
     httpServer.listen(PORT, () => {
       console.log(`✓ Server running on port ${PORT}`);
       console.log(`✓ Environment: ${process.env.NODE_ENV || 'development'}`);
+      
+      // Start room cleanup service
+      roomCleanupService.start();
     });
   } catch (error) {
     console.error('Failed to start server:', error);
@@ -87,6 +91,7 @@ async function startServer() {
 
 process.on('SIGTERM', async () => {
   console.log('SIGTERM received, shutting down gracefully');
+  roomCleanupService.stop();
   httpServer.close(async () => {
     await pool.end();
     await redis.quit();
