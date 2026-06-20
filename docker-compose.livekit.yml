@@ -6,19 +6,9 @@ services:
     container_name: livekit-server
     command: --config /etc/livekit.yaml
     restart: unless-stopped
-    ports:
-      - "7880:7880"      # HTTP/WebSocket
-      - "7881:7881/tcp"  # TURN/TCP
-      - "50000-60000:50000-60000/udp"  # RTC
+    network_mode: host
     volumes:
       - ./livekit-config.yaml:/etc/livekit.yaml:ro
     environment:
       - LIVEKIT_API_KEY=${LIVEKIT_API_KEY}
       - LIVEKIT_API_SECRET=${LIVEKIT_API_SECRET}
-    networks:
-      - cup2cup-network
-
-networks:
-  cup2cup-network:
-    external: true
-    name: bridge
