@@ -53,8 +53,15 @@ class JitsiService {
           startWithAudioMuted: false,
           startWithVideoMuted: true, // Audio only by default
           enableWelcomePage: false,
-          prejoinPageEnabled: false,
+          prejoinPageEnabled: false, // Skip the prejoin screen
           disableDeepLinking: true,
+          // Auto-join settings
+          subject: config.roomName,
+          hideConferenceSubject: true,
+          hideConferenceTimer: false,
+          // Disable video completely
+          startVideoMuted: 999,
+          disableVideoMute: true,
         },
         interfaceConfigOverwrite: {
           TOOLBAR_BUTTONS: [
