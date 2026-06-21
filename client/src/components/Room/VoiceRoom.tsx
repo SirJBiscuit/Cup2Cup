@@ -15,6 +15,7 @@ const VoiceRoom = () => {
   const [chatInput, setChatInput] = useState('');
   const [connected, setConnected] = useState(false);
   const [voiceEnabled, setVoiceEnabled] = useState(false);
+  const [jitsiReady, setJitsiReady] = useState(false);
   const [micError, setMicError] = useState('');
   const [darkMode, setDarkMode] = useState(() => {
     const saved = localStorage.getItem('darkMode');
@@ -205,36 +206,40 @@ const VoiceRoom = () => {
               
               {voiceEnabled && connected && phraseCode && (
                 <div className="space-y-3">
-                  {/* Connection Status */}
-                  <div className="flex items-center gap-2 px-3 py-2 bg-green-900/20 border border-green-700 rounded-lg">
-                    <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                    <span className="text-green-400 text-sm font-medium">Voice Chat Connected</span>
-                  </div>
+                  {/* Connection Status - Only show when Jitsi is ready */}
+                  {jitsiReady && (
+                    <div className="flex items-center gap-2 px-3 py-2 bg-green-900/20 border border-green-700 rounded-lg">
+                      <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                      <span className="text-green-400 text-sm font-medium">Voice Chat Connected</span>
+                    </div>
+                  )}
 
                   {/* Voice Controls */}
-                  <div className="flex gap-2 flex-wrap">
-                    <button
-                      onClick={() => {
-                        const audio = new Audio();
-                        navigator.mediaDevices.getUserMedia({ audio: true })
-                          .then(stream => {
-                            const audioContext = new AudioContext();
-                            const source = audioContext.createMediaStreamSource(stream);
-                            const destination = audioContext.createMediaStreamDestination();
-                            source.connect(destination);
-                            audio.srcObject = destination.stream;
-                            audio.play();
-                            setTimeout(() => {
-                              audio.pause();
-                              stream.getTracks().forEach(track => track.stop());
-                            }, 3000);
-                          });
-                      }}
-                      className="px-3 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-medium transition-colors"
-                    >
-                      🎧 Test Audio (3s)
-                    </button>
-                  </div>
+                  {jitsiReady && (
+                    <div className="flex gap-2 flex-wrap">
+                      <button
+                        onClick={() => {
+                          const audio = new Audio();
+                          navigator.mediaDevices.getUserMedia({ audio: true })
+                            .then(stream => {
+                              const audioContext = new AudioContext();
+                              const source = audioContext.createMediaStreamSource(stream);
+                              const destination = audioContext.createMediaStreamDestination();
+                              source.connect(destination);
+                              audio.srcObject = destination.stream;
+                              audio.play();
+                              setTimeout(() => {
+                                audio.pause();
+                                stream.getTracks().forEach(track => track.stop());
+                              }, 3000);
+                            });
+                        }}
+                        className="px-3 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-medium transition-colors"
+                      >
+                        🎧 Test Audio (3s)
+                      </button>
+                    </div>
+                  )}
 
                   {/* Jitsi Voice Chat - Taller iframe to show controls */}
                   <div className="h-96 bg-gray-900 rounded-lg overflow-hidden border border-gray-700">
@@ -243,6 +248,7 @@ const VoiceRoom = () => {
                       displayName={searchParams.get('name') ? decodeURIComponent(searchParams.get('name')!) : 'User'}
                       onReady={() => {
                         console.log('Jitsi voice chat ready');
+                        setJitsiReady(true);
                         setMicError('');
                       }}
                     />
