@@ -19,7 +19,7 @@ interface JitsiConfig {
 
 class JitsiService {
   private api: any = null;
-  private domain = (import.meta as any).env?.VITE_JITSI_DOMAIN || '8x8.vc'; // Use public Jitsi server
+  private domain = (import.meta as any).env?.VITE_JITSI_DOMAIN || 'meet.jit.si'; // Use public Jitsi server
   private scriptLoaded = false;
 
   async loadScript(): Promise<void> {
