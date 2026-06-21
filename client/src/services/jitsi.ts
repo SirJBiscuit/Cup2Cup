@@ -51,17 +51,24 @@ class JitsiService {
         parentNode: config.parentNode,
         configOverwrite: {
           startWithAudioMuted: false,
-          startWithVideoMuted: true, // Audio only by default
+          startWithVideoMuted: true,
           enableWelcomePage: false,
-          prejoinPageEnabled: false, // Skip the prejoin screen
+          prejoinPageEnabled: false,
+          prejoinConfig: {
+            enabled: false,
+          },
           disableDeepLinking: true,
-          // Auto-join settings
           subject: config.roomName,
           hideConferenceSubject: true,
           hideConferenceTimer: false,
-          // Disable video completely
           startVideoMuted: 999,
           disableVideoMute: true,
+          // Force auto-join
+          autoKnockLobby: false,
+          enableLobbyChat: false,
+          // Skip authentication
+          requireDisplayName: false,
+          enableInsecureRoomNameWarning: false,
         },
         interfaceConfigOverwrite: {
           TOOLBAR_BUTTONS: [
