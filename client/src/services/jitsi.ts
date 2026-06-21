@@ -40,7 +40,9 @@ class JitsiService {
 
   async connect(config: JitsiConfig): Promise<void> {
     try {
+      console.log('🎤 Loading Jitsi script...');
       await this.loadScript();
+      console.log('✓ Jitsi script loaded');
 
       const options = {
         roomName: config.roomName,
@@ -73,12 +75,19 @@ class JitsiService {
         },
       };
 
+      console.log('🎤 Creating Jitsi instance for room:', config.roomName);
       this.api = new window.JitsiMeetExternalAPI(this.domain, options);
+      console.log('✓ Jitsi instance created');
 
       // Set up event listeners
-      if (config.onReady) {
-        this.api.addEventListener('videoConferenceJoined', config.onReady);
-      }
+      this.api.addEventListener('videoConferenceJoined', () => {
+        console.log('✓ Video conference joined!');
+        if (config.onReady) config.onReady();
+      });
+
+      this.api.addEventListener('readyToClose', () => {
+        console.log('Jitsi ready to close');
+      });
 
       if (config.onParticipantJoined) {
         this.api.addEventListener('participantJoined', config.onParticipantJoined);
@@ -88,13 +97,14 @@ class JitsiService {
         this.api.addEventListener('participantLeft', config.onParticipantLeft);
       }
 
-      if (config.onError) {
-        this.api.addEventListener('errorOccurred', config.onError);
-      }
+      this.api.addEventListener('errorOccurred', (error: any) => {
+        console.error('❌ Jitsi error:', error);
+        if (config.onError) config.onError(error);
+      });
 
-      console.log('✓ Jitsi connected');
+      console.log('✓ Jitsi connected, waiting for conference join...');
     } catch (error) {
-      console.error('Jitsi connection error:', error);
+      console.error('❌ Jitsi connection error:', error);
       throw error;
     }
   }
