@@ -1,5 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
-import jitsiService from '../../services/jitsi';
+import { useEffect, useState } from 'react';
 
 interface JitsiVoiceProps {
   roomName: string;
@@ -8,73 +7,21 @@ interface JitsiVoiceProps {
   onError?: (error: any) => void;
 }
 
-const JitsiVoice = ({ roomName, displayName, onReady, onError }: JitsiVoiceProps) => {
-  const containerRef = useRef<HTMLDivElement>(null);
+const JitsiVoice = ({ roomName, displayName, onReady }: JitsiVoiceProps) => {
   const [loading, setLoading] = useState(true);
-  const [connected, setConnected] = useState(false);
 
   useEffect(() => {
-    const initJitsi = async () => {
-      if (!containerRef.current) return;
+    // Hide loading after iframe loads
+    const timer = setTimeout(() => {
+      setLoading(false);
+      onReady?.();
+    }, 2000);
 
-      try {
-        await jitsiService.connect({
-          roomName,
-          displayName,
-          parentNode: containerRef.current,
-          onReady: () => {
-            setLoading(false);
-            setConnected(true);
-            onReady?.();
-          },
-          onError: (err) => {
-            console.error('Jitsi error (non-critical):', err);
-            setLoading(false);
-            setConnected(true); // Still consider it connected
-            onError?.(err);
-          },
-        });
+    return () => clearTimeout(timer);
+  }, [onReady]);
 
-        // Fallback: Hide loading after 5 seconds even if ready event doesn't fire
-        setTimeout(() => {
-          setLoading(false);
-          setConnected(true);
-        }, 5000);
-
-        // Auto-click the join button if prejoin screen appears
-        const autoJoinInterval = setInterval(() => {
-          const iframe = containerRef.current?.querySelector('iframe');
-          if (iframe?.contentWindow) {
-            try {
-              const joinButton = iframe.contentWindow.document.querySelector('[data-testid="prejoin.joinMeeting"]') ||
-                                 iframe.contentWindow.document.querySelector('button[aria-label*="Join"]') ||
-                                 iframe.contentWindow.document.querySelector('button:contains("Join")');
-              if (joinButton) {
-                console.log('🎤 Auto-clicking join button...');
-                (joinButton as HTMLElement).click();
-                clearInterval(autoJoinInterval);
-              }
-            } catch (e) {
-              // Cross-origin iframe, can't access
-            }
-          }
-        }, 500);
-
-        // Stop trying after 10 seconds
-        setTimeout(() => clearInterval(autoJoinInterval), 10000);
-      } catch (err) {
-        console.error('Failed to initialize Jitsi:', err);
-        setLoading(false);
-        onError?.(err);
-      }
-    };
-
-    initJitsi();
-
-    return () => {
-      jitsiService.disconnect();
-    };
-  }, [roomName, displayName, onReady, onError]);
+  // Build Jitsi URL with config parameters
+  const jitsiUrl = `https://meet.jit.si/${encodeURIComponent(roomName)}#userInfo.displayName="${encodeURIComponent(displayName)}"&config.prejoinPageEnabled=false&config.startWithAudioMuted=false&config.startWithVideoMuted=true`;
 
   return (
     <div className="relative w-full h-full">
@@ -87,14 +34,15 @@ const JitsiVoice = ({ roomName, displayName, onReady, onError }: JitsiVoiceProps
         </div>
       )}
       
-      {connected && !loading && (
-        <div className="absolute top-2 right-2 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-semibold z-20 flex items-center gap-1">
-          <span className="w-2 h-2 bg-white rounded-full animate-pulse"></span>
-          Voice Ready
-        </div>
-      )}
-      
-      <div ref={containerRef} className="w-full h-full" />
+      <iframe
+        src={jitsiUrl}
+        allow="camera; microphone; fullscreen; display-capture; autoplay"
+        className="w-full h-full border-0"
+        onLoad={() => {
+          setLoading(false);
+          onReady?.();
+        }}
+      />
     </div>
   );
 };
