@@ -88,12 +88,22 @@ class JitsiService {
         },
         userInfo: {
           displayName: config.displayName,
+          email: `${config.displayName}@cup2cup.local`, // Fake email to bypass prejoin
         },
       };
 
       console.log('🎤 Creating Jitsi instance for room:', config.roomName);
       this.api = new window.JitsiMeetExternalAPI(this.domain, options);
       console.log('✓ Jitsi instance created');
+
+      // Force join the conference immediately
+      setTimeout(() => {
+        if (this.api) {
+          console.log('🎤 Executing join command...');
+          this.api.executeCommand('toggleLobby', false);
+          this.api.executeCommand('startRecording', { mode: 'stream' }); // Dummy command to trigger join
+        }
+      }, 1000);
 
       // Set up event listeners - listen to multiple events for reliability
       let readyFired = false;
