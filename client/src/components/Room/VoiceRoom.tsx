@@ -155,39 +155,49 @@ const VoiceRoom = () => {
           <div className="bg-gray-800 rounded-lg p-6 h-full">
             <h2 className="text-xl font-semibold mb-4">Participants</h2>
             <div className="space-y-3">
-              {participants.map((participant) => (
-                <div
-                  key={participant.socketId}
-                  className="bg-gray-700 rounded-lg p-4 flex items-center justify-between"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center font-bold">
-                      {participant.displayName.charAt(0).toUpperCase()}
+              {participants.map((participant) => {
+                const isCurrentUser = participant.socketId === socketService.getSocket()?.id;
+                return (
+                  <div
+                    key={participant.socketId}
+                    className={`rounded-lg p-4 flex items-center justify-between ${
+                      isCurrentUser ? 'bg-blue-900/30 border-2 border-blue-600' : 'bg-gray-700'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
+                        isCurrentUser ? 'bg-blue-600' : 'bg-gray-600'
+                      }`}>
+                        {participant.displayName.charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                        <p className="font-medium">
+                          {participant.displayName}
+                          {isCurrentUser && <span className="text-blue-400 ml-2">(You)</span>}
+                        </p>
+                        <p className="text-xs text-gray-400">
+                          {participant.userId ? 'Account' : 'Guest'}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-medium">{participant.displayName}</p>
-                      <p className="text-xs text-gray-400">
-                        {participant.userId ? 'Account' : 'Guest'}
-                      </p>
+                    <div className="flex gap-2 items-center">
+                      {participant.isMuted && (
+                        <span className="text-red-400 text-sm flex items-center gap-1">
+                          <span className="w-2 h-2 bg-red-400 rounded-full"></span>
+                          Muted
+                        </span>
+                      )}
+                      {participant.isSpeaking && !participant.isMuted && (
+                        <span className="text-green-400 text-sm flex items-center gap-1 animate-pulse">
+                          <span className="w-2 h-2 bg-green-400 rounded-full animate-ping"></span>
+                          <span className="w-2 h-2 bg-green-400 rounded-full absolute"></span>
+                          Speaking
+                        </span>
+                      )}
                     </div>
                   </div>
-                  <div className="flex gap-2 items-center">
-                    {participant.isMuted && (
-                      <span className="text-red-400 text-sm flex items-center gap-1">
-                        <span className="w-2 h-2 bg-red-400 rounded-full"></span>
-                        Muted
-                      </span>
-                    )}
-                    {participant.isSpeaking && !participant.isMuted && (
-                      <span className="text-green-400 text-sm flex items-center gap-1 animate-pulse">
-                        <span className="w-2 h-2 bg-green-400 rounded-full animate-ping"></span>
-                        <span className="w-2 h-2 bg-green-400 rounded-full absolute"></span>
-                        Speaking
-                      </span>
-                    )}
-                  </div>
-                </div>
-              ))}
+                );
+              })}
               {participants.length === 0 && (
                 <p className="text-gray-400 text-center py-8">
                   Waiting for participants...
