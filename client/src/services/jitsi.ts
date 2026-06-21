@@ -19,7 +19,7 @@ interface JitsiConfig {
 
 class JitsiService {
   private api: any = null;
-  private domain = (import.meta as any).env?.VITE_JITSI_DOMAIN || 'meet.jit.si'; // Use custom domain or public server
+  private domain = (import.meta as any).env?.VITE_JITSI_DOMAIN || 'meet.cup2cup.xyz:8443'; // Use custom server
   private scriptLoaded = false;
 
   async loadScript(): Promise<void> {
