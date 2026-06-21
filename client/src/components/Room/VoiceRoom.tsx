@@ -204,15 +204,43 @@ const VoiceRoom = () => {
               )}
               
               {voiceEnabled && connected && phraseCode && (
-                <div className="h-48 bg-gray-900 rounded-lg overflow-hidden border border-gray-700">
-                  <JitsiVoice
-                    roomName={`cup2cup-${phraseCode}`}
-                    displayName={searchParams.get('name') ? decodeURIComponent(searchParams.get('name')!) : 'User'}
-                    onReady={() => {
-                      console.log('Jitsi voice chat ready');
-                      setMicError('');
-                    }}
-                  />
+                <div className="space-y-3">
+                  {/* Voice Controls */}
+                  <div className="flex gap-2 flex-wrap">
+                    <button
+                      onClick={() => {
+                        const audio = new Audio();
+                        navigator.mediaDevices.getUserMedia({ audio: true })
+                          .then(stream => {
+                            const audioContext = new AudioContext();
+                            const source = audioContext.createMediaStreamSource(stream);
+                            const destination = audioContext.createMediaStreamDestination();
+                            source.connect(destination);
+                            audio.srcObject = destination.stream;
+                            audio.play();
+                            setTimeout(() => {
+                              audio.pause();
+                              stream.getTracks().forEach(track => track.stop());
+                            }, 3000);
+                          });
+                      }}
+                      className="px-3 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-medium transition-colors"
+                    >
+                      🎧 Test Audio (3s)
+                    </button>
+                  </div>
+
+                  {/* Jitsi Voice Chat */}
+                  <div className="h-48 bg-gray-900 rounded-lg overflow-hidden border border-gray-700">
+                    <JitsiVoice
+                      roomName={`cup2cup-${phraseCode}`}
+                      displayName={searchParams.get('name') ? decodeURIComponent(searchParams.get('name')!) : 'User'}
+                      onReady={() => {
+                        console.log('Jitsi voice chat ready');
+                        setMicError('');
+                      }}
+                    />
+                  </div>
                 </div>
               )}
             </div>
