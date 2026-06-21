@@ -205,6 +205,12 @@ const VoiceRoom = () => {
               
               {voiceEnabled && connected && phraseCode && (
                 <div className="space-y-3">
+                  {/* Connection Status */}
+                  <div className="flex items-center gap-2 px-3 py-2 bg-green-900/20 border border-green-700 rounded-lg">
+                    <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                    <span className="text-green-400 text-sm font-medium">Voice Chat Connected</span>
+                  </div>
+
                   {/* Voice Controls */}
                   <div className="flex gap-2 flex-wrap">
                     <button
@@ -230,8 +236,8 @@ const VoiceRoom = () => {
                     </button>
                   </div>
 
-                  {/* Jitsi Voice Chat */}
-                  <div className="h-48 bg-gray-900 rounded-lg overflow-hidden border border-gray-700">
+                  {/* Jitsi Voice Chat - Taller iframe to show controls */}
+                  <div className="h-96 bg-gray-900 rounded-lg overflow-hidden border border-gray-700">
                     <JitsiVoice
                       roomName={`cup2cup-${phraseCode}`}
                       displayName={searchParams.get('name') ? decodeURIComponent(searchParams.get('name')!) : 'User'}
