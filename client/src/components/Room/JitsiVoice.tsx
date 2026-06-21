@@ -40,6 +40,28 @@ const JitsiVoice = ({ roomName, displayName, onReady, onError }: JitsiVoiceProps
           setLoading(false);
           setConnected(true);
         }, 5000);
+
+        // Auto-click the join button if prejoin screen appears
+        const autoJoinInterval = setInterval(() => {
+          const iframe = containerRef.current?.querySelector('iframe');
+          if (iframe?.contentWindow) {
+            try {
+              const joinButton = iframe.contentWindow.document.querySelector('[data-testid="prejoin.joinMeeting"]') ||
+                                 iframe.contentWindow.document.querySelector('button[aria-label*="Join"]') ||
+                                 iframe.contentWindow.document.querySelector('button:contains("Join")');
+              if (joinButton) {
+                console.log('🎤 Auto-clicking join button...');
+                (joinButton as HTMLElement).click();
+                clearInterval(autoJoinInterval);
+              }
+            } catch (e) {
+              // Cross-origin iframe, can't access
+            }
+          }
+        }, 500);
+
+        // Stop trying after 10 seconds
+        setTimeout(() => clearInterval(autoJoinInterval), 10000);
       } catch (err) {
         console.error('Failed to initialize Jitsi:', err);
         setLoading(false);
