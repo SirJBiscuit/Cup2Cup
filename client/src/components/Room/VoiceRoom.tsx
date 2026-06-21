@@ -212,10 +212,6 @@ const VoiceRoom = () => {
                       console.log('Jitsi voice chat ready');
                       setMicError('');
                     }}
-                    onError={(error) => {
-                      console.error('Jitsi error:', error);
-                      setMicError('Voice chat connection failed');
-                    }}
                   />
                 </div>
               )}
