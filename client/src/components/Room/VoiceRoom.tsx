@@ -92,12 +92,43 @@ const VoiceRoom = () => {
     navigate(token ? '/dashboard' : '/');
   };
 
+  const handleCopyRoomCode = () => {
+    if (phraseCode) {
+      navigator.clipboard.writeText(phraseCode);
+      alert('Room code copied to clipboard!');
+    }
+  };
+
+  const handleShareRoom = () => {
+    if (phraseCode) {
+      const shareUrl = `${window.location.origin}/room/${phraseCode}`;
+      navigator.clipboard.writeText(shareUrl);
+      alert('Room link copied to clipboard!');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white">
       <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold">Room: {phraseCode}</h1>
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+          <div className="flex items-center gap-3">
+            <h1 className="text-2xl font-bold">Room: {phraseCode}</h1>
+            <button
+              onClick={handleCopyRoomCode}
+              className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg transition"
+              title="Copy room code"
+            >
+              📋 Copy Code
+            </button>
+            <button
+              onClick={handleShareRoom}
+              className="px-3 py-1 bg-green-600 hover:bg-green-700 text-white text-sm rounded-lg transition"
+              title="Copy shareable link"
+            >
+              🔗 Share Link
+            </button>
+          </div>
+          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
             {connected ? `${participants.length} participant${participants.length !== 1 ? 's' : ''}` : 'Connecting...'}
           </p>
         </div>
