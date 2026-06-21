@@ -32,6 +32,11 @@ const JitsiVoice = ({ roomName, displayName, onReady, onError }: JitsiVoiceProps
             onError?.(err);
           },
         });
+
+        // Fallback: Hide loading after 5 seconds even if ready event doesn't fire
+        setTimeout(() => {
+          setLoading(false);
+        }, 5000);
       } catch (err) {
         console.error('Failed to initialize Jitsi:', err);
         setError('Failed to load voice chat');

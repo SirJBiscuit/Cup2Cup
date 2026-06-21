@@ -79,10 +79,31 @@ class JitsiService {
       this.api = new window.JitsiMeetExternalAPI(this.domain, options);
       console.log('✓ Jitsi instance created');
 
-      // Set up event listeners
+      // Set up event listeners - listen to multiple events for reliability
+      let readyFired = false;
+      
+      const fireReady = () => {
+        if (!readyFired && config.onReady) {
+          readyFired = true;
+          console.log('✓ Jitsi ready!');
+          config.onReady();
+        }
+      };
+
+      // These events all indicate the room is ready
       this.api.addEventListener('videoConferenceJoined', () => {
-        console.log('✓ Video conference joined!');
-        if (config.onReady) config.onReady();
+        console.log('✓ Conference joined');
+        fireReady();
+      });
+
+      this.api.addEventListener('participantJoined', () => {
+        console.log('✓ Participant joined');
+        fireReady();
+      });
+
+      this.api.addEventListener('audioMuteStatusChanged', () => {
+        console.log('✓ Audio status changed');
+        fireReady();
       });
 
       this.api.addEventListener('readyToClose', () => {
