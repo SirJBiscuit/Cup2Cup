@@ -151,13 +151,24 @@ class JitsiService {
       });
 
       this.api.addEventListener('errorOccurred', (error: any) => {
-        console.error('❌ Jitsi error:', error);
+        console.error('❌ Jitsi error occurred:', {
+          error,
+          message: error?.message,
+          type: error?.type,
+          details: error
+        });
         if (config.onError) config.onError(error);
       });
 
       console.log('✓ Jitsi connected, waiting for conference join...');
-    } catch (error) {
-      console.error('❌ Jitsi connection error:', error);
+    } catch (error: any) {
+      console.error('❌ Jitsi connection error:', {
+        error,
+        message: error?.message,
+        stack: error?.stack,
+        domain: this.domain,
+        roomName: config.roomName
+      });
       throw error;
     }
   }
