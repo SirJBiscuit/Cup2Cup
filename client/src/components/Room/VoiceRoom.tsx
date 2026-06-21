@@ -22,6 +22,29 @@ const VoiceRoom = () => {
     return saved !== null ? JSON.parse(saved) : true;
   });
 
+  // Helper function to get display name
+  const getDisplayName = () => {
+    const isGuest = searchParams.get('guest') === 'true';
+    const guestName = searchParams.get('name');
+    
+    if (isGuest && guestName) {
+      return decodeURIComponent(guestName);
+    }
+    
+    // For logged-in users, get username from localStorage
+    const userDataStr = localStorage.getItem('userData');
+    if (userDataStr) {
+      try {
+        const userData = JSON.parse(userDataStr);
+        return userData.username || userData.email || 'User';
+      } catch (e) {
+        console.error('Failed to parse user data:', e);
+      }
+    }
+    
+    return 'User';
+  };
+
   useEffect(() => {
     localStorage.setItem('darkMode', JSON.stringify(darkMode));
     if (darkMode) {
@@ -32,14 +55,11 @@ const VoiceRoom = () => {
   }, [darkMode]);
 
   useEffect(() => {
-    const isGuest = searchParams.get('guest') === 'true';
-    const guestName = searchParams.get('name');
-
     const socket = socketService.connect();
     
     socket.emit('join-room', {
       phraseCode,
-      displayName: isGuest && guestName ? decodeURIComponent(guestName) : 'User',
+      displayName: getDisplayName(),
     });
 
     socketService.onJoinedRoom(async (data) => {
@@ -255,7 +275,7 @@ const VoiceRoom = () => {
                   <div className="h-96 bg-gray-900 rounded-lg overflow-hidden border border-gray-700">
                     <JitsiVoice
                       roomName={`cup2cup-${phraseCode}`}
-                      displayName={searchParams.get('name') ? decodeURIComponent(searchParams.get('name')!) : 'User'}
+                      displayName={getDisplayName()}
                       onReady={() => {
                         console.log('Jitsi voice chat ready');
                         setJitsiReady(true);
