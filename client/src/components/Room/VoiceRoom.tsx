@@ -170,12 +170,19 @@ const VoiceRoom = () => {
                       </p>
                     </div>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 items-center">
                     {participant.isMuted && (
-                      <span className="text-red-400 text-sm">🔇 Muted</span>
+                      <span className="text-red-400 text-sm flex items-center gap-1">
+                        <span className="w-2 h-2 bg-red-400 rounded-full"></span>
+                        Muted
+                      </span>
                     )}
-                    {participant.isSpeaking && (
-                      <span className="text-green-400 text-sm">🎤 Speaking</span>
+                    {participant.isSpeaking && !participant.isMuted && (
+                      <span className="text-green-400 text-sm flex items-center gap-1 animate-pulse">
+                        <span className="w-2 h-2 bg-green-400 rounded-full animate-ping"></span>
+                        <span className="w-2 h-2 bg-green-400 rounded-full absolute"></span>
+                        Speaking
+                      </span>
                     )}
                   </div>
                 </div>
@@ -188,7 +195,7 @@ const VoiceRoom = () => {
             </div>
 
             <div className="mt-6 pt-6 border-t border-gray-700">
-              <h3 className="text-lg font-semibold mb-3">Voice Chat</h3>
+              <h3 className="text-lg font-semibold mb-3">🎤 Voice Chat</h3>
               
               {micError && (
                 <div className="mb-3 bg-red-900/20 border border-red-800 text-red-400 px-4 py-2 rounded-lg text-sm">
@@ -197,7 +204,7 @@ const VoiceRoom = () => {
               )}
               
               {voiceEnabled && connected && phraseCode && (
-                <div className="h-96 bg-gray-900 rounded-lg overflow-hidden">
+                <div className="h-48 bg-gray-900 rounded-lg overflow-hidden border border-gray-700">
                   <JitsiVoice
                     roomName={`cup2cup-${phraseCode}`}
                     displayName={searchParams.get('name') ? decodeURIComponent(searchParams.get('name')!) : 'User'}

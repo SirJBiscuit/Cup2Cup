@@ -67,15 +67,17 @@ class JitsiService {
           TOOLBAR_BUTTONS: [
             'microphone',
             'hangup',
-            'settings',
             'raisehand',
-            'videoquality',
-            'stats',
-            'shortcuts',
           ],
           SHOW_JITSI_WATERMARK: false,
           SHOW_WATERMARK_FOR_GUESTS: false,
+          SHOW_BRAND_WATERMARK: false,
+          SHOW_POWERED_BY: false,
           DEFAULT_BACKGROUND: '#1a1a1a',
+          DISABLE_VIDEO_BACKGROUND: true,
+          FILM_STRIP_MAX_HEIGHT: 0,
+          VERTICAL_FILMSTRIP: false,
+          HIDE_INVITE_MORE_HEADER: true,
         },
         userInfo: {
           displayName: config.displayName,
@@ -124,6 +126,12 @@ class JitsiService {
       if (config.onParticipantLeft) {
         this.api.addEventListener('participantLeft', config.onParticipantLeft);
       }
+
+      // Listen for audio level changes to detect speaking
+      this.api.addEventListener('audioLevelChanged', (data: any) => {
+        const isSpeaking = data.audioLevel > 0.1; // Threshold for speaking
+        console.log(`Audio level: ${data.audioLevel}, Speaking: ${isSpeaking}`);
+      });
 
       this.api.addEventListener('errorOccurred', (error: any) => {
         console.error('❌ Jitsi error:', error);
