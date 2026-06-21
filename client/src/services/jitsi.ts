@@ -19,7 +19,7 @@ interface JitsiConfig {
 
 class JitsiService {
   private api: any = null;
-  private domain = (import.meta as any).env?.VITE_JITSI_DOMAIN || 'meet.cup2cup.xyz:8443'; // Use custom server with prejoin disabled
+  private domain = (import.meta as any).env?.VITE_JITSI_DOMAIN || 'meet.cup2cup.xyz'; // Use custom server on port 443
   private scriptLoaded = false;
 
   async loadScript(): Promise<void> {
