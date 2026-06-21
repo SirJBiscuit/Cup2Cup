@@ -42,12 +42,22 @@ export const setupSocketHandlers = (io) => {
           [room.id, userId || null, displayName, !userId]
         );
 
-        // Get all participants
+        // Get all participants and clean up ghost entries
         const participantIds = await redis.smembers(`room:${phraseCode}:participants`);
         const participants = [];
+        const connectedSockets = Array.from(io.sockets.sockets.keys());
         
         for (const id of participantIds) {
           const data = await redis.hgetall(`participant:${id}`);
+          
+          // Remove ghost participants (disconnected sockets still in Redis)
+          if (!connectedSockets.includes(id)) {
+            console.log(`🧹 Cleaning up ghost participant: ${id}`);
+            await redis.srem(`room:${phraseCode}:participants`, id);
+            await redis.del(`participant:${id}`);
+            continue;
+          }
+          
           if (data.displayName) {
             participants.push({
               socketId: id,

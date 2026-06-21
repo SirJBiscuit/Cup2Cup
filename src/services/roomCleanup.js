@@ -27,20 +27,31 @@ class RoomCleanupService {
     try {
       // Get all active rooms
       const result = await query(
-        `SELECT id, phrase_code FROM phrase_codes WHERE is_active = true`
+        `SELECT id, phrase_code, is_persistent, expires_at FROM phrase_codes WHERE is_active = true`
       );
 
       for (const room of result.rows) {
+        // Check if room has expired
+        if (room.expires_at && new Date(room.expires_at) < new Date()) {
+          console.log(`⏰ Room ${room.phrase_code} has expired`);
+          await this.deleteRoom(room);
+          continue;
+        }
+
         const participantCount = await this.getParticipantCount(room.phrase_code);
 
         if (participantCount === 0) {
           // Room is empty
-          if (!this.emptyRoomTimestamps.has(room.id)) {
-            // First time seeing this room empty, record the timestamp
+          if (!room.is_persistent) {
+            // Temporary rooms are deleted immediately when empty
+            console.log(`🗑️  Deleting empty temporary room: ${room.phrase_code}`);
+            await this.deleteRoom(room);
+          } else if (!this.emptyRoomTimestamps.has(room.id)) {
+            // Persistent rooms: record first time empty
             this.emptyRoomTimestamps.set(room.id, Date.now());
-            console.log(`📭 Room ${room.phrase_code} is now empty`);
+            console.log(`📭 Persistent room ${room.phrase_code} is now empty`);
           } else {
-            // Check if room has been empty long enough
+            // Check if persistent room has been empty long enough
             const emptyDuration = Date.now() - this.emptyRoomTimestamps.get(room.id);
             if (emptyDuration >= EMPTY_ROOM_TIMEOUT) {
               await this.deleteRoom(room);

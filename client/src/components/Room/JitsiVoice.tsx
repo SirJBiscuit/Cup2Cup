@@ -20,8 +20,8 @@ const JitsiVoice = ({ roomName, displayName, onReady }: JitsiVoiceProps) => {
     return () => clearTimeout(timer);
   }, [onReady]);
 
-  // Build Jitsi URL with config parameters
-  const jitsiUrl = `https://meet.jit.si/${encodeURIComponent(roomName)}#userInfo.displayName="${encodeURIComponent(displayName)}"&config.prejoinPageEnabled=false&config.startWithAudioMuted=false&config.startWithVideoMuted=true`;
+  // Build Jitsi URL with custom server - prejoin is disabled on our server!
+  const jitsiUrl = `https://jitsi.cup2cup.xyz/${encodeURIComponent(roomName)}#config.startWithAudioMuted=false&config.startWithVideoMuted=true&userInfo.displayName="${encodeURIComponent(displayName)}"`;
 
   return (
     <div className="relative w-full h-full">
@@ -29,7 +29,8 @@ const JitsiVoice = ({ roomName, displayName, onReady }: JitsiVoiceProps) => {
         <div className="absolute inset-0 flex items-center justify-center bg-gray-900 bg-opacity-75 z-10">
           <div className="text-center">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-            <p className="text-white">Connecting to voice chat...</p>
+            <p className="text-white">Loading voice chat...</p>
+            <p className="text-gray-400 text-sm mt-2">Click "Join meeting" when ready</p>
           </div>
         </div>
       )}
