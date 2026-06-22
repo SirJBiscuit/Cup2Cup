@@ -27,15 +27,11 @@ export const useDeviceDetection = (): DeviceInfo => {
     // Screen size breakpoints
     const isMobileScreen = screenWidth < 768;
     const isTabletScreen = screenWidth >= 768 && screenWidth < 1024;
-    const isDesktopScreen = screenWidth >= 1024;
     
     // Combine checks for more accurate detection
     const isMobile = (isMobileUA && isMobileScreen) || (isTouchDevice && isMobileScreen);
     const isTablet = (isMobileUA && isTabletScreen) || (isTouchDevice && isTabletScreen && !isMobile);
     const isDesktop = !isMobile && !isTablet;
-    
-    // Size multipliers for responsive scaling
-    const sizeMultiplier = isMobile ? 0.85 : isTablet ? 1 : 1.15;
     
     const orientation = screenWidth > screenHeight ? 'landscape' : 'portrait';
     
