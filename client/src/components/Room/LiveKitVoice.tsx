@@ -72,7 +72,7 @@ const LiveKitVoice = ({ roomName, displayName, onReady, onError }: LiveKitVoiceP
           updateParticipants();
         });
 
-        room.on(RoomEvent.TrackSubscribed, (track: RemoteTrack, publication: RemoteTrackPublication, participant: RemoteParticipant) => {
+        room.on(RoomEvent.TrackSubscribed, (track: RemoteTrack, _publication: RemoteTrackPublication, participant: RemoteParticipant) => {
           if (track.kind === 'audio') {
             const audioElement = track.attach();
             document.body.appendChild(audioElement);
@@ -81,7 +81,7 @@ const LiveKitVoice = ({ roomName, displayName, onReady, onError }: LiveKitVoiceP
         });
 
         room.on(RoomEvent.TrackUnsubscribed, (track: RemoteTrack) => {
-          track.detach().forEach(element => element.remove());
+          track.detach().forEach((element: HTMLMediaElement) => element.remove());
         });
 
         // Connect to room
@@ -93,7 +93,7 @@ const LiveKitVoice = ({ roomName, displayName, onReady, onError }: LiveKitVoiceP
         const updateParticipants = () => {
           if (room) {
             const participantNames = Array.from(room.remoteParticipants.values()).map(
-              p => p.identity
+              (p: RemoteParticipant) => p.identity
             );
             setParticipants([room.localParticipant.identity, ...participantNames]);
           }
