@@ -71,6 +71,14 @@ const LiveKitVoice = ({ roomName, displayName, onReady, onError }: LiveKitVoiceP
         room = new Room({
           adaptiveStream: true,
           dynacast: true,
+          reconnectPolicy: {
+            nextRetryDelayInMs: (context) => {
+              console.log('Reconnect attempt:', context.retryCount);
+              return Math.min(1000 * Math.pow(2, context.retryCount), 10000);
+            },
+            maxRetries: 10,
+          },
+          disconnectOnPageLeave: false, // Don't disconnect on page visibility changes
           audioCaptureDefaults: {
             autoGainControl: true,
             echoCancellation: true, // Strong echo cancellation

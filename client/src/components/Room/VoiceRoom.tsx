@@ -33,25 +33,48 @@ const VoiceRoom = () => {
     const isGuest = searchParams.get('guest') === 'true';
     const guestName = searchParams.get('name');
     const userDataStr = localStorage.getItem('userData');
+    const accessToken = localStorage.getItem('accessToken');
     
-    // If guest without name, or no user data, show prompt
-    if (isGuest && !guestName) {
-      setShowNamePrompt(true);
-    } else if (!isGuest && !userDataStr) {
-      setShowNamePrompt(true);
-    } else {
-      // Set display name immediately
-      if (isGuest && guestName) {
-        setFinalDisplayName(decodeURIComponent(guestName));
-      } else if (userDataStr) {
-        try {
-          const userData = JSON.parse(userDataStr);
-          setFinalDisplayName(userData.username || userData.displayName || 'User');
-        } catch (e) {
-          setShowNamePrompt(true);
-        }
+    console.log('Display name setup - isGuest:', isGuest, 'guestName:', guestName, 'hasUserData:', !!userDataStr, 'hasToken:', !!accessToken);
+    
+    // If guest with name in URL, use it
+    if (isGuest && guestName) {
+      const decodedName = decodeURIComponent(guestName);
+      console.log('Using guest name from URL:', decodedName);
+      setFinalDisplayName(decodedName);
+      return;
+    }
+    
+    // If logged-in user (has access token), get from userData
+    if (accessToken && userDataStr) {
+      try {
+        const userData = JSON.parse(userDataStr);
+        const name = userData.displayName || userData.username || userData.email;
+        console.log('Using logged-in user name:', name, 'from userData:', userData);
+        setFinalDisplayName(name);
+        return;
+      } catch (e) {
+        console.error('Failed to parse userData:', e);
       }
     }
+    
+    // If guest without name, show prompt
+    if (isGuest && !guestName) {
+      console.log('Guest without name, showing prompt');
+      setShowNamePrompt(true);
+      return;
+    }
+    
+    // If no token and no guest params, show prompt
+    if (!accessToken && !isGuest) {
+      console.log('No token and not guest, showing prompt');
+      setShowNamePrompt(true);
+      return;
+    }
+    
+    // Fallback: show prompt
+    console.log('Fallback: showing name prompt');
+    setShowNamePrompt(true);
   }, [searchParams]);
 
   // Memoize display name so it doesn't change on every render
