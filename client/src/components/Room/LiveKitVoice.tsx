@@ -66,24 +66,17 @@ const LiveKitVoice = ({ roomName, displayName, onReady, onError }: LiveKitVoiceP
 
         const { token, url } = await response.json();
 
-        // Create room with maximum audio quality and industrial noise blocking
+        // Create room with maximum audio quality, industrial noise blocking, and echo removal
         room = new Room({
           adaptiveStream: true,
           dynacast: true,
           audioCaptureDefaults: {
-            autoGainControl: {
-              ideal: true,
-            },
-            echoCancellation: {
-              ideal: true,
-            },
-            noiseSuppression: {
-              ideal: true, // Maximum noise suppression for factory/industrial sounds
-            },
+            autoGainControl: true,
+            echoCancellation: true, // Strong echo cancellation
+            noiseSuppression: true, // Maximum noise suppression for factory/industrial sounds
             sampleRate: 48000, // High quality sample rate (48kHz)
             sampleSize: 16, // 16-bit audio depth
             channelCount: 1, // Mono for voice (saves bandwidth)
-            latency: 0, // Minimize latency
           },
           publishDefaults: {
             audioPreset: {
