@@ -190,14 +190,10 @@ const LiveKitVoice = ({ roomName, displayName, onReady, onError }: LiveKitVoiceP
         await room.connect(url, token);
         console.log('✓ Room connected, enabling microphone...');
 
-        // Enable microphone with optimized settings to prevent cutoff
+        // Enable microphone (audio quality already set in room config)
         try {
           await room.localParticipant.setMicrophoneEnabled(true, {
             deviceId: selectedDeviceId || undefined,
-            // Disable Voice Activity Detection to prevent cutting off speech
-            audioPreset: {
-              maxBitrate: 128000,
-            },
           });
           console.log('✓ Microphone enabled');
           
