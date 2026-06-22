@@ -79,9 +79,9 @@ const LiveKitVoice = ({ roomName, displayName, onReady, onError }: LiveKitVoiceP
           },
           publishDefaults: {
             audioPreset: {
-              maxBitrate: 96000, // 96 kbps for high quality voice
+              maxBitrate: 64000, // 64 kbps - good balance of quality and stability
             },
-            dtx: true, // Discontinuous transmission - saves bandwidth when not speaking
+            dtx: false, // Disable DTX to prevent cutting out
             red: true, // Redundant encoding for packet loss recovery
           },
         });
