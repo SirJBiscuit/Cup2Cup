@@ -66,23 +66,32 @@ const LiveKitVoice = ({ roomName, displayName, onReady, onError }: LiveKitVoiceP
 
         const { token, url } = await response.json();
 
-        // Create room with enhanced audio quality settings (Discord Krisp-like)
+        // Create room with maximum audio quality and industrial noise blocking
         room = new Room({
           adaptiveStream: true,
           dynacast: true,
           audioCaptureDefaults: {
-            autoGainControl: true,
-            echoCancellation: true,
-            noiseSuppression: true, // Browser's built-in noise suppression (Krisp-like)
+            autoGainControl: {
+              ideal: true,
+            },
+            echoCancellation: {
+              ideal: true,
+            },
+            noiseSuppression: {
+              ideal: true, // Maximum noise suppression for factory/industrial sounds
+            },
             sampleRate: 48000, // High quality sample rate (48kHz)
+            sampleSize: 16, // 16-bit audio depth
             channelCount: 1, // Mono for voice (saves bandwidth)
+            latency: 0, // Minimize latency
           },
           publishDefaults: {
             audioPreset: {
-              maxBitrate: 128000, // 128 kbps - higher quality for clearer audio
+              maxBitrate: 256000, // 256 kbps - maximum quality for clearest audio
             },
             dtx: false, // Disable DTX to prevent cutting out
             red: true, // Redundant encoding for packet loss recovery
+            simulcast: false, // Disable simulcast for consistent quality
           },
         });
 
