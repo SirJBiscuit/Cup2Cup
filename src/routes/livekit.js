@@ -29,7 +29,7 @@ router.post('/token', optionalAuth, async (req, res) => {
     // });
 
     // Generate token
-    const token = createLiveKitToken(roomName, participantName, {
+    const token = await createLiveKitToken(roomName, participantName, {
       userId: req.user?.id,
       isGuest: !req.user,
     });

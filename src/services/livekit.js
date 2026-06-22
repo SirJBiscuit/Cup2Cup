@@ -14,7 +14,7 @@ const getRoomService = () => {
   return roomService;
 };
 
-export const createLiveKitToken = (roomName, participantName, metadata = {}) => {
+export const createLiveKitToken = async (roomName, participantName, metadata = {}) => {
   if (!LIVEKIT_API_KEY || !LIVEKIT_API_SECRET) {
     throw new Error('LiveKit API credentials not configured');
   }
@@ -32,7 +32,7 @@ export const createLiveKitToken = (roomName, participantName, metadata = {}) => 
     canPublishData: true,
   });
 
-  return token.toJwt();
+  return await token.toJwt();
 };
 
 export const createRoom = async (roomName, options = {}) => {
