@@ -115,26 +115,39 @@ const LiveKitVoice = ({ roomName, displayName, onReady, onError }: LiveKitVoiceP
           track.detach().forEach((element: HTMLMediaElement) => element.remove());
         });
 
-        // Monitor audio levels for voice activity
-        room.on(RoomEvent.TrackSubscribed, (track: RemoteTrack, _publication: RemoteTrackPublication, participant: RemoteParticipant) => {
-          if (track.kind === 'audio') {
-            track.on('audioLevelChanged', (level: number) => {
-              if (level > 0.01) {
-                setSpeakingParticipants(prev => new Set(prev).add(participant.identity));
-              } else {
-                setSpeakingParticipants(prev => {
-                  const newSet = new Set(prev);
-                  newSet.delete(participant.identity);
-                  return newSet;
-                });
-              }
-            });
-          }
+        // Monitor speaking activity using isSpeaking events
+        room.on(RoomEvent.ParticipantConnected, (participant: RemoteParticipant) => {
+          participant.on('isSpeakingChanged', (speaking: boolean) => {
+            if (speaking) {
+              setSpeakingParticipants(prev => new Set(prev).add(participant.identity));
+            } else {
+              setSpeakingParticipants(prev => {
+                const newSet = new Set(prev);
+                newSet.delete(participant.identity);
+                return newSet;
+              });
+            }
+          });
+        });
+
+        // Track existing participants
+        room.remoteParticipants.forEach((participant: RemoteParticipant) => {
+          participant.on('isSpeakingChanged', (speaking: boolean) => {
+            if (speaking) {
+              setSpeakingParticipants(prev => new Set(prev).add(participant.identity));
+            } else {
+              setSpeakingParticipants(prev => {
+                const newSet = new Set(prev);
+                newSet.delete(participant.identity);
+                return newSet;
+              });
+            }
+          });
         });
 
         // Track local participant speaking
-        room.localParticipant.on('audioLevelChanged', (level: number) => {
-          if (level > 0.01) {
+        room.localParticipant.on('isSpeakingChanged', (speaking: boolean) => {
+          if (speaking) {
             setSpeakingParticipants(prev => new Set(prev).add(displayName));
           } else {
             setSpeakingParticipants(prev => {
