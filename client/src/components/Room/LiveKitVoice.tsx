@@ -116,7 +116,7 @@ const LiveKitVoice = ({ roomName, displayName, onReady, onError }: LiveKitVoiceP
         });
 
         // Monitor audio levels for voice activity
-        room.on(RoomEvent.TrackSubscribed, (track: RemoteTrack, publication: RemoteTrackPublication, participant: RemoteParticipant) => {
+        room.on(RoomEvent.TrackSubscribed, (track: RemoteTrack, _publication: RemoteTrackPublication, participant: RemoteParticipant) => {
           if (track.kind === 'audio') {
             track.on('audioLevelChanged', (level: number) => {
               if (level > 0.01) {
