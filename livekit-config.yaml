@@ -5,8 +5,8 @@ rtc:
   use_external_ip: true
   
 keys:
-  devkey: Fw1xtxVPRex+P1CZQtbJnEkXEB+HpWIuNsP0f6RhNTk=
-  secret: 5NkvX/NP1c6loJ0Ut7uHTK4vFXU0EFlkYyr0i6xWvbA=
+  devkey: FdbkqmLYwi5nEgfnO60VFm+YZLCMFq5Vi8bR97w3xcU=
+  secret: Q+4Vdu3IePNr0/dqtVsLdC8arWSSPPJW61pA4W+ilMU=
 
 room:
   auto_create: true
