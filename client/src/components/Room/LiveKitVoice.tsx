@@ -193,28 +193,28 @@ const LiveKitVoice = ({ roomName, displayName, onReady, onError }: LiveKitVoiceP
         await room.connect(url, token);
         console.log('✓ Room connected, waiting for engine to be ready...');
 
-        // Wait for engine to be fully connected and ready
-        let engineReady = false;
-        let engineWaitTime = 0;
-        const maxEngineWait = 10000; // 10 seconds max wait
+        // Wait for room state to be fully connected
+        let roomReady = false;
+        let roomWaitTime = 0;
+        const maxRoomWait = 10000; // 10 seconds max wait
         
-        while (!engineReady && engineWaitTime < maxEngineWait) {
-          if (room.engine && room.engine.connectionState === 'connected') {
-            engineReady = true;
-            console.log('✓ Engine is connected and ready');
+        while (!roomReady && roomWaitTime < maxRoomWait) {
+          if (room.state === 'connected') {
+            roomReady = true;
+            console.log('✓ Room is fully connected and ready');
           } else {
             await new Promise(resolve => setTimeout(resolve, 500));
-            engineWaitTime += 500;
-            console.log(`Waiting for engine... (${engineWaitTime}ms)`);
+            roomWaitTime += 500;
+            console.log(`Waiting for room to be ready... (${roomWaitTime}ms) - current state: ${room.state}`);
           }
         }
         
-        if (!engineReady) {
-          throw new Error('Engine failed to connect within timeout');
+        if (!roomReady) {
+          throw new Error('Room failed to connect within timeout');
         }
         
-        // Additional wait to ensure engine is stable
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        // Additional wait to ensure connection is stable
+        await new Promise(resolve => setTimeout(resolve, 1500));
         console.log('Enabling microphone...');
 
         // Enable microphone with retry logic (audio quality already set in room config)
