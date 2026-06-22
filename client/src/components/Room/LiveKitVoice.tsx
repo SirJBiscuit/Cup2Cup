@@ -191,7 +191,31 @@ const LiveKitVoice = ({ roomName, displayName, onReady, onError }: LiveKitVoiceP
 
         // Connect to room (LiveKit Cloud provides its own TURN servers)
         await room.connect(url, token);
-        console.log('✓ Room connected, enabling microphone...');
+        console.log('✓ Room connected, waiting for engine to be ready...');
+
+        // Wait for engine to be fully connected and ready
+        let engineReady = false;
+        let engineWaitTime = 0;
+        const maxEngineWait = 10000; // 10 seconds max wait
+        
+        while (!engineReady && engineWaitTime < maxEngineWait) {
+          if (room.engine && room.engine.connectionState === 'connected') {
+            engineReady = true;
+            console.log('✓ Engine is connected and ready');
+          } else {
+            await new Promise(resolve => setTimeout(resolve, 500));
+            engineWaitTime += 500;
+            console.log(`Waiting for engine... (${engineWaitTime}ms)`);
+          }
+        }
+        
+        if (!engineReady) {
+          throw new Error('Engine failed to connect within timeout');
+        }
+        
+        // Additional wait to ensure engine is stable
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        console.log('Enabling microphone...');
 
         // Enable microphone with retry logic (audio quality already set in room config)
         let micRetries = 0;
@@ -228,7 +252,7 @@ const LiveKitVoice = ({ roomName, displayName, onReady, onError }: LiveKitVoiceP
             }
             
             // Wait before retrying
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            await new Promise(resolve => setTimeout(resolve, 1500));
           }
         }
 
