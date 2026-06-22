@@ -66,7 +66,7 @@ const LiveKitVoice = ({ roomName, displayName, onReady, onError }: LiveKitVoiceP
 
         const { token, url } = await response.json();
 
-        // Create room
+        // Create room with enhanced audio quality settings
         room = new Room({
           adaptiveStream: true,
           dynacast: true,
@@ -74,6 +74,15 @@ const LiveKitVoice = ({ roomName, displayName, onReady, onError }: LiveKitVoiceP
             autoGainControl: true,
             echoCancellation: true,
             noiseSuppression: true,
+            sampleRate: 48000, // High quality sample rate (48kHz)
+            channelCount: 1, // Mono for voice (saves bandwidth)
+          },
+          publishDefaults: {
+            audioPreset: {
+              maxBitrate: 96000, // 96 kbps for high quality voice
+            },
+            dtx: true, // Discontinuous transmission - saves bandwidth when not speaking
+            red: true, // Redundant encoding for packet loss recovery
           },
         });
 
