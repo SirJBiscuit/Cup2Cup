@@ -159,18 +159,12 @@ const LiveKitVoice = ({ roomName, displayName, onReady, onError }: LiveKitVoiceP
         });
 
         // Update ping every 5 seconds
-        const pingInterval = setInterval(async () => {
+        const pingInterval = setInterval(() => {
           if (room && room.engine) {
-            const stats = await room.engine.getConnectedServerAddress();
             // Estimate ping from connection quality
             setPing(Math.round(Math.random() * 50 + 20)); // Placeholder - LiveKit doesn't expose ping directly
           }
         }, 5000);
-
-        // Cleanup interval
-        const cleanup = () => {
-          clearInterval(pingInterval);
-        };
 
         // Connect to room (LiveKit Cloud provides its own TURN servers)
         await room.connect(url, token);
