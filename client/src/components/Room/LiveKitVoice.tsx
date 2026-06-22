@@ -118,7 +118,9 @@ const LiveKitVoice = ({ roomName, displayName, onReady, onError }: LiveKitVoiceP
 
         // Monitor speaking activity using isSpeaking events
         room.on(RoomEvent.ParticipantConnected, (participant: RemoteParticipant) => {
+          console.log('Participant connected:', participant.identity);
           participant.on('isSpeakingChanged', (speaking: boolean) => {
+            console.log(`${participant.identity} speaking:`, speaking);
             if (speaking) {
               setSpeakingParticipants(prev => new Set(prev).add(participant.identity));
             } else {
@@ -129,11 +131,13 @@ const LiveKitVoice = ({ roomName, displayName, onReady, onError }: LiveKitVoiceP
               });
             }
           });
+          updateParticipants();
         });
 
         // Track existing participants
         room.remoteParticipants.forEach((participant: RemoteParticipant) => {
           participant.on('isSpeakingChanged', (speaking: boolean) => {
+            console.log(`${participant.identity} speaking:`, speaking);
             if (speaking) {
               setSpeakingParticipants(prev => new Set(prev).add(participant.identity));
             } else {
@@ -148,6 +152,7 @@ const LiveKitVoice = ({ roomName, displayName, onReady, onError }: LiveKitVoiceP
 
         // Track local participant speaking
         room.localParticipant.on('isSpeakingChanged', (speaking: boolean) => {
+          console.log(`You (${displayName}) speaking:`, speaking);
           if (speaking) {
             setSpeakingParticipants(prev => new Set(prev).add(displayName));
           } else {
@@ -157,6 +162,11 @@ const LiveKitVoice = ({ roomName, displayName, onReady, onError }: LiveKitVoiceP
               return newSet;
             });
           }
+        });
+        
+        // Update participants when someone disconnects
+        room.on(RoomEvent.ParticipantDisconnected, () => {
+          updateParticipants();
         });
 
         // Update ping every 5 seconds
@@ -390,15 +400,21 @@ const LiveKitVoice = ({ roomName, displayName, onReady, onError }: LiveKitVoiceP
       
       <div className="space-y-2">
         <p className="text-xs text-gray-500 mb-2">Participants in voice chat:</p>
-        {participants.map((name, index) => (
-          <div key={index} className="flex items-center gap-2 text-gray-300 text-sm">
-            <div className={`w-2 h-2 rounded-full ${
-              speakingParticipants.has(name) ? 'bg-green-500 animate-pulse' : 'bg-blue-500'
-            }`}></div>
-            <span className="flex-1">{name}</span>
-            {index === 0 && <span className="text-blue-400 text-xs">(You)</span>}
-          </div>
-        ))}
+        {participants.map((name, index) => {
+          const isSpeaking = speakingParticipants.has(name);
+          return (
+            <div key={index} className="flex items-center gap-2 text-gray-300 text-sm bg-gray-800 rounded px-2 py-1.5">
+              <div className={`w-3 h-3 rounded-full transition-all ${
+                isSpeaking 
+                  ? 'bg-green-500 animate-pulse shadow-lg shadow-green-500/50' 
+                  : 'bg-gray-600'
+              }`}></div>
+              <span className="flex-1 font-medium">{name}</span>
+              {isSpeaking && <span className="text-green-400 text-xs animate-pulse">🎤 Speaking</span>}
+              {index === 0 && <span className="text-blue-400 text-xs">(You)</span>}
+            </div>
+          );
+        })}
         {participants.length === 0 && (
           <p className="text-gray-500 text-xs">No participants yet</p>
         )}
