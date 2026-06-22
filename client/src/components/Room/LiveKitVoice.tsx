@@ -43,6 +43,7 @@ const LiveKitVoice = ({ roomName, displayName, onReady, onError }: LiveKitVoiceP
 
   useEffect(() => {
     let room: Room | null = null;
+    let pingInterval: ReturnType<typeof setInterval> | null = null;
 
     const connectToRoom = async () => {
       try {
@@ -159,7 +160,7 @@ const LiveKitVoice = ({ roomName, displayName, onReady, onError }: LiveKitVoiceP
         });
 
         // Update ping every 5 seconds
-        const pingInterval = setInterval(() => {
+        pingInterval = setInterval(() => {
           if (room && room.engine) {
             // Estimate ping from connection quality
             setPing(Math.round(Math.random() * 50 + 20)); // Placeholder - LiveKit doesn't expose ping directly
@@ -212,6 +213,9 @@ const LiveKitVoice = ({ roomName, displayName, onReady, onError }: LiveKitVoiceP
 
     // Cleanup
     return () => {
+      if (pingInterval) {
+        clearInterval(pingInterval);
+      }
       if (room) {
         room.disconnect();
       }
