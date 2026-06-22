@@ -34,6 +34,9 @@ export const useDeviceDetection = (): DeviceInfo => {
     const isTablet = (isMobileUA && isTabletScreen) || (isTouchDevice && isTabletScreen && !isMobile);
     const isDesktop = !isMobile && !isTablet;
     
+    // Size multipliers for responsive scaling
+    const sizeMultiplier = isMobile ? 0.85 : isTablet ? 1 : 1.15;
+    
     const orientation = screenWidth > screenHeight ? 'landscape' : 'portrait';
     
     // Detect platform
