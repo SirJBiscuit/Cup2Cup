@@ -20,8 +20,8 @@ const JitsiVoice = ({ roomName, displayName, onReady }: JitsiVoiceProps) => {
     return () => clearTimeout(timer);
   }, [onReady]);
 
-  // Build Jitsi URL with custom server - prejoin is disabled on our server!
-  const jitsiUrl = `https://jitsi.cup2cup.xyz/${encodeURIComponent(roomName)}#config.startWithAudioMuted=false&config.startWithVideoMuted=true&userInfo.displayName="${encodeURIComponent(displayName)}"`;
+  // Build Jitsi URL with public server (custom server had config issues)
+  const jitsiUrl = `https://meet.jit.si/${encodeURIComponent(roomName)}#config.startWithAudioMuted=false&config.startWithVideoMuted=true&userInfo.displayName="${encodeURIComponent(displayName)}"`;
 
   return (
     <div className="relative w-full h-full">
