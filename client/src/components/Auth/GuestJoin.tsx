@@ -32,7 +32,7 @@ const GuestJoin = () => {
     try {
       const newRoom = await roomAPI.createRoom({
         isPersistent: false,
-        maxParticipants: 10,
+        maxParticipants: 4,
       });
       navigate(`/room/${newRoom.phraseCode}?guest=true&name=${encodeURIComponent(displayName)}`);
     } catch (err: any) {

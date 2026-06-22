@@ -8,9 +8,9 @@ const Dashboard = () => {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [isPersistent, setIsPersistent] = useState(true);
+  const [isPersistent, setIsPersistent] = useState(false);
   const [password, setPassword] = useState('');
-  const [maxParticipants, setMaxParticipants] = useState(10);
+  const [maxParticipants, setMaxParticipants] = useState(4);
   const [darkMode, setDarkMode] = useState(() => {
     const saved = localStorage.getItem('darkMode');
     return saved !== null ? JSON.parse(saved) : true;
@@ -56,6 +56,27 @@ const Dashboard = () => {
       navigate(`/room/${newRoom.phraseCode}`);
     } catch (error: any) {
       alert(error.response?.data?.error || 'Failed to create room');
+    }
+  };
+
+  const handleQuickRoom = async () => {
+    try {
+      const newRoom = await roomAPI.createRoom({
+        isPersistent: false,
+        maxParticipants: 4,
+      });
+      
+      // Copy share link to clipboard
+      const shareUrl = `${window.location.origin}/room/${newRoom.phraseCode}`;
+      await navigator.clipboard.writeText(shareUrl);
+      
+      // Show success message
+      alert('Quick room created! Link copied to clipboard.');
+      
+      // Navigate to the room
+      navigate(`/room/${newRoom.phraseCode}`);
+    } catch (error: any) {
+      alert(error.response?.data?.error || 'Failed to create quick room');
     }
   };
 
@@ -129,6 +150,19 @@ const Dashboard = () => {
             My Rooms
           </h2>
           <div className="flex gap-3 w-full sm:w-auto">
+            <button
+              onClick={handleQuickRoom}
+              className="flex-1 sm:flex-initial px-6 py-3 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl"
+              title="Create temporary room (4 people, no password) and copy link"
+            >
+              ⚡ Quick Room
+            </button>
+            <button
+              onClick={() => setShowCreateModal(true)}
+              className="flex-1 sm:flex-initial px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl"
+            >
+              + Create Room
+            </button>
             {user?.isAdmin && (
               <button
                 onClick={() => navigate('/admin')}
@@ -137,12 +171,6 @@ const Dashboard = () => {
                 🛠️ Admin Panel
               </button>
             )}
-            <button
-              onClick={() => setShowCreateModal(true)}
-              className="flex-1 sm:flex-initial px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all duration-200 transform hover:scale-105 active:scale-95 shadow-lg hover:shadow-xl"
-            >
-              + Create Room
-            </button>
           </div>
         </div>
 
@@ -243,7 +271,7 @@ const Dashboard = () => {
                 </label>
                 <input
                   type="range"
-                  min="2"
+                  min="1"
                   max="20"
                   value={maxParticipants}
                   onChange={(e) => setMaxParticipants(parseInt(e.target.value))}

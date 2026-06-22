@@ -3,12 +3,14 @@ import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import socketService from '../../services/socket';
 import soundService from '../../services/sounds';
 import LiveKitVoice from './LiveKitVoice';
+import { useDeviceDetection } from '../../hooks/useDeviceDetection';
 import type { Participant, ChatMessage } from '../../types';
 
 const VoiceRoom = () => {
   const { phraseCode } = useParams<{ phraseCode: string }>();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const device = useDeviceDetection();
   
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
@@ -17,6 +19,7 @@ const VoiceRoom = () => {
   const [voiceEnabled, setVoiceEnabled] = useState(false);
   const [jitsiReady, setJitsiReady] = useState(false);
   const [micError, setMicError] = useState('');
+  const [showChat, setShowChat] = useState(!device.isMobile);
   const [darkMode, setDarkMode] = useState(() => {
     const saved = localStorage.getItem('darkMode');
     return saved !== null ? JSON.parse(saved) : true;
@@ -130,30 +133,39 @@ const VoiceRoom = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white">
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex justify-between items-center">
-        <div>
-          <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-bold">Room: {phraseCode}</h1>
+      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-3 md:px-6 py-3 md:py-4 flex justify-between items-center">
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 md:gap-3 flex-wrap">
+            <h1 className="text-lg md:text-2xl font-bold truncate">Room: {phraseCode}</h1>
             <button
               onClick={handleCopyRoomCode}
-              className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg transition"
+              className="px-2 md:px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs md:text-sm rounded-lg transition"
               title="Copy room code"
             >
-              📋 Copy Code
+              📋 {device.isMobile ? '' : 'Copy Code'}
             </button>
             <button
               onClick={handleShareRoom}
-              className="px-3 py-1 bg-green-600 hover:bg-green-700 text-white text-sm rounded-lg transition"
+              className="px-2 md:px-3 py-1 bg-green-600 hover:bg-green-700 text-white text-xs md:text-sm rounded-lg transition"
               title="Copy shareable link"
             >
-              🔗 Share Link
+              🔗 {device.isMobile ? '' : 'Share Link'}
             </button>
           </div>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+          <p className="text-xs md:text-sm text-gray-600 dark:text-gray-400 mt-1">
             {connected ? `${participants.length} participant${participants.length !== 1 ? 's' : ''}` : 'Connecting...'}
           </p>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 md:gap-4">
+          {device.isMobile && (
+            <button
+              onClick={() => setShowChat(!showChat)}
+              className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
+              title="Toggle chat"
+            >
+              💬
+            </button>
+          )}
           <button
             onClick={() => setDarkMode(!darkMode)}
             className="p-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white"
@@ -163,15 +175,15 @@ const VoiceRoom = () => {
           </button>
           <button
             onClick={handleLeaveRoom}
-            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition"
+            className="px-2 md:px-4 py-1.5 md:py-2 bg-red-600 hover:bg-red-700 text-white text-xs md:text-sm rounded-lg transition"
           >
-            Leave Room
+            {device.isMobile ? '🚪' : 'Leave Room'}
           </button>
         </div>
       </div>
 
-      <div className="flex h-[calc(100vh-73px)]">
-        <div className="flex-1 p-6">
+      <div className={`flex ${device.isMobile ? 'flex-col' : ''} h-[calc(100vh-73px)]`}>
+        <div className={`flex-1 p-3 md:p-6 ${device.isMobile && showChat ? 'hidden' : ''}`}>
           <div className="bg-gray-800 rounded-lg p-6 h-full">
             <h2 className="text-xl font-semibold mb-4">Participants</h2>
             <div className="space-y-3">
@@ -244,32 +256,6 @@ const VoiceRoom = () => {
                     </div>
                   )}
 
-                  {/* Voice Controls */}
-                  {jitsiReady && (
-                    <div className="flex gap-2 flex-wrap">
-                      <button
-                        onClick={() => {
-                          const audio = new Audio();
-                          navigator.mediaDevices.getUserMedia({ audio: true })
-                            .then(stream => {
-                              const audioContext = new AudioContext();
-                              const source = audioContext.createMediaStreamSource(stream);
-                              const destination = audioContext.createMediaStreamDestination();
-                              source.connect(destination);
-                              audio.srcObject = destination.stream;
-                              audio.play();
-                              setTimeout(() => {
-                                audio.pause();
-                                stream.getTracks().forEach(track => track.stop());
-                              }, 3000);
-                            });
-                        }}
-                        className="px-3 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg text-sm font-medium transition-colors"
-                      >
-                        🎧 Test Audio (3s)
-                      </button>
-                    </div>
-                  )}
 
                   {/* LiveKit Voice Chat - Audio only, high quality */}
                   <div className="h-96 bg-gray-900 rounded-lg overflow-hidden border border-gray-700">
@@ -289,7 +275,7 @@ const VoiceRoom = () => {
           </div>
         </div>
 
-        <div className="w-96 bg-gray-800 border-l border-gray-700 flex flex-col">
+        <div className={`${device.isMobile ? (showChat ? 'flex' : 'hidden') : 'flex'} ${device.isMobile ? 'w-full' : 'w-96'} bg-gray-800 ${device.isMobile ? 'border-t' : 'border-l'} border-gray-700 flex-col`}>
           <div className="p-4 border-b border-gray-700">
             <h2 className="text-xl font-semibold">Chat</h2>
           </div>

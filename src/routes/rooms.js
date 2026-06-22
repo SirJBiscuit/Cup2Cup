@@ -20,6 +20,9 @@ router.post('/create', optionalAuth, async (req, res) => {
   try {
     const { isPersistent = true, password, maxParticipants = 10 } = req.body;
     
+    // Validate maxParticipants (min: 1, max: 20)
+    const validatedMaxParticipants = Math.min(Math.max(parseInt(maxParticipants) || 10, 1), 20);
+    
     // Guests can only create temporary rooms
     const isGuest = !req.user;
     const actuallyPersistent = isGuest ? false : isPersistent;
@@ -46,7 +49,7 @@ router.post('/create', optionalAuth, async (req, res) => {
       `INSERT INTO phrase_codes (owner_id, phrase_code, is_persistent, password_hash, max_participants, expires_at)
        VALUES ($1, $2, $3, $4, $5, $6)
        RETURNING id, phrase_code, is_persistent, max_participants, created_at`,
-      [ownerId, phraseCode, actuallyPersistent, passwordHash, maxParticipants, expiresAt]
+      [ownerId, phraseCode, actuallyPersistent, passwordHash, validatedMaxParticipants, expiresAt]
     );
 
     const room = result.rows[0];
