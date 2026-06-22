@@ -193,23 +193,43 @@ const LiveKitVoice = ({ roomName, displayName, onReady, onError }: LiveKitVoiceP
         await room.connect(url, token);
         console.log('✓ Room connected, enabling microphone...');
 
-        // Enable microphone (audio quality already set in room config)
-        try {
-          await room.localParticipant.setMicrophoneEnabled(true, {
-            deviceId: selectedDeviceId || undefined,
-          });
-          console.log('✓ Microphone enabled');
-          
-          // Get local audio track for self-monitoring
-          const audioTrack = room.localParticipant.audioTrackPublications.values().next().value?.audioTrack;
-          if (audioTrack) {
-            const audioElement = audioTrack.attach();
-            audioElement.muted = true; // Start muted (hear self is off by default)
-            localAudioRef.current = audioElement;
+        // Enable microphone with retry logic (audio quality already set in room config)
+        let micRetries = 0;
+        const maxMicRetries = 3;
+        
+        while (micRetries < maxMicRetries) {
+          try {
+            console.log(`Attempting to enable microphone (attempt ${micRetries + 1}/${maxMicRetries})...`);
+            
+            await room.localParticipant.setMicrophoneEnabled(true, {
+              deviceId: selectedDeviceId || undefined,
+            });
+            
+            // Wait for publication to complete
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            
+            console.log('✓ Microphone enabled successfully');
+            
+            // Get local audio track for self-monitoring
+            const audioTrack = room.localParticipant.audioTrackPublications.values().next().value?.audioTrack;
+            if (audioTrack) {
+              const audioElement = audioTrack.attach();
+              audioElement.muted = true; // Start muted (hear self is off by default)
+              localAudioRef.current = audioElement;
+            }
+            
+            break; // Success, exit retry loop
+          } catch (micError: any) {
+            micRetries++;
+            console.error(`Microphone error (attempt ${micRetries}/${maxMicRetries}):`, micError);
+            
+            if (micRetries >= maxMicRetries) {
+              throw new Error(`Microphone access failed after ${maxMicRetries} attempts: ${micError.message}`);
+            }
+            
+            // Wait before retrying
+            await new Promise(resolve => setTimeout(resolve, 1000));
           }
-        } catch (micError: any) {
-          console.error('Microphone error:', micError);
-          throw new Error(`Microphone access failed: ${micError.message}`);
         }
 
         const updateParticipants = () => {

@@ -20,42 +20,44 @@ const VoiceRoom = () => {
   const [jitsiReady, setJitsiReady] = useState(false);
   const [micError, setMicError] = useState('');
   const [showChat, setShowChat] = useState(!device.isMobile);
+  const [showNamePrompt, setShowNamePrompt] = useState(false);
+  const [guestNameInput, setGuestNameInput] = useState('');
+  const [finalDisplayName, setFinalDisplayName] = useState<string | null>(null);
   const [darkMode, setDarkMode] = useState(() => {
     const saved = localStorage.getItem('darkMode');
     return saved !== null ? JSON.parse(saved) : true;
   });
 
-  // Memoize display name so it doesn't change on every render
-  const displayName = useMemo(() => {
+  // Check if user needs to provide a display name
+  useEffect(() => {
     const isGuest = searchParams.get('guest') === 'true';
     const guestName = searchParams.get('name');
-    
-    console.log('Getting display name - isGuest:', isGuest, 'guestName:', guestName);
-    
-    if (isGuest && guestName) {
-      const decodedName = decodeURIComponent(guestName);
-      console.log('Using guest name:', decodedName);
-      return decodedName;
-    }
-    
-    // For logged-in users, get username from localStorage
     const userDataStr = localStorage.getItem('userData');
-    console.log('userData from localStorage:', userDataStr);
     
-    if (userDataStr) {
-      try {
-        const userData = JSON.parse(userDataStr);
-        const name = userData.username || userData.email || 'User';
-        console.log('Using logged-in user display name:', name);
-        return name;
-      } catch (e) {
-        console.error('Failed to parse user data:', e);
+    // If guest without name, or no user data, show prompt
+    if (isGuest && !guestName) {
+      setShowNamePrompt(true);
+    } else if (!isGuest && !userDataStr) {
+      setShowNamePrompt(true);
+    } else {
+      // Set display name immediately
+      if (isGuest && guestName) {
+        setFinalDisplayName(decodeURIComponent(guestName));
+      } else if (userDataStr) {
+        try {
+          const userData = JSON.parse(userDataStr);
+          setFinalDisplayName(userData.username || userData.displayName || 'User');
+        } catch (e) {
+          setShowNamePrompt(true);
+        }
       }
     }
-    
-    console.log('Using fallback display name: User');
-    return 'User';
   }, [searchParams]);
+
+  // Memoize display name so it doesn't change on every render
+  const displayName = useMemo(() => {
+    return finalDisplayName || 'Guest';
+  }, [finalDisplayName]);
 
   useEffect(() => {
     localStorage.setItem('darkMode', JSON.stringify(darkMode));
@@ -139,6 +141,87 @@ const VoiceRoom = () => {
       alert('Room link copied to clipboard!');
     }
   };
+
+  const handleNameSubmit = (e: any) => {
+    e.preventDefault();
+    if (guestNameInput.trim()) {
+      setFinalDisplayName(guestNameInput.trim());
+      setShowNamePrompt(false);
+    }
+  };
+
+  // Prevent multiple tabs on mobile
+  useEffect(() => {
+    if (!device.isMobile) return;
+
+    const tabId = `cup2cup-tab-${Date.now()}`;
+    sessionStorage.setItem('cup2cup-tab-id', tabId);
+    localStorage.setItem('cup2cup-active-tab', tabId);
+
+    const checkActiveTab = () => {
+      const activeTab = localStorage.getItem('cup2cup-active-tab');
+      const currentTab = sessionStorage.getItem('cup2cup-tab-id');
+      
+      if (activeTab !== currentTab) {
+        alert('Cup2Cup is already open in another tab. Please close other tabs.');
+        window.close();
+      }
+    };
+
+    const interval = setInterval(checkActiveTab, 1000);
+
+    window.addEventListener('beforeunload', () => {
+      const activeTab = localStorage.getItem('cup2cup-active-tab');
+      const currentTab = sessionStorage.getItem('cup2cup-tab-id');
+      if (activeTab === currentTab) {
+        localStorage.removeItem('cup2cup-active-tab');
+      }
+    });
+
+    return () => {
+      clearInterval(interval);
+      const activeTab = localStorage.getItem('cup2cup-active-tab');
+      const currentTab = sessionStorage.getItem('cup2cup-tab-id');
+      if (activeTab === currentTab) {
+        localStorage.removeItem('cup2cup-active-tab');
+      }
+    };
+  }, [device.isMobile]);
+
+  // Don't render room until we have a display name
+  if (!finalDisplayName) {
+    return (
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white flex items-center justify-center">
+        {showNamePrompt && (
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 md:p-8 max-w-md w-full mx-4">
+            <h2 className="text-2xl font-bold mb-4">Welcome to Cup2Cup!</h2>
+            <p className="text-gray-600 dark:text-gray-400 mb-6">
+              Please enter your display name to join the voice room.
+            </p>
+            <form onSubmit={handleNameSubmit}>
+              <input
+                type="text"
+                value={guestNameInput}
+                onChange={(e) => setGuestNameInput(e.target.value)}
+                placeholder="Enter your name..."
+                className="w-full px-4 py-3 bg-gray-100 dark:bg-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none mb-4"
+                autoFocus
+                required
+                minLength={2}
+                maxLength={20}
+              />
+              <button
+                type="submit"
+                className="w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition"
+              >
+                Join Room
+              </button>
+            </form>
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white">
