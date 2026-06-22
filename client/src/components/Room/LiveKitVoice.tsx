@@ -216,7 +216,9 @@ const LiveKitVoice = ({ roomName, displayName, onReady, onError }: LiveKitVoiceP
             const participantNames = Array.from(room.remoteParticipants.values()).map(
               (p: RemoteParticipant) => p.identity
             );
-            setParticipants([room.localParticipant.identity, ...participantNames]);
+            // Use displayName for local participant, identity for remote
+            setParticipants([displayName, ...participantNames]);
+            console.log('Participants updated:', [displayName, ...participantNames]);
           }
         };
 
