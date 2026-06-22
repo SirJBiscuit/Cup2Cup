@@ -34,6 +34,9 @@ router.post('/token', optionalAuth, async (req, res) => {
       isGuest: !req.user,
     });
 
+    console.log('Generated token type:', typeof token);
+    console.log('Generated token:', token);
+
     res.json({
       token,
       url: process.env.LIVEKIT_URL || 'wss://livekit.cup2cup.xyz',
