@@ -13,14 +13,5 @@ room:
   empty_timeout: 300
   max_participants: 20
 
-# Audio-only, high quality settings
-audio:
-  # Use Opus codec for best quality
-  opus_bitrate: 128000  # 128kbps for high quality audio
-  
-# Disable video completely
-video:
-  enabled: false
-
 logging:
   level: info
