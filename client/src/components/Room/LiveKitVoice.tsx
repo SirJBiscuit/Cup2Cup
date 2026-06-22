@@ -73,7 +73,7 @@ const LiveKitVoice = ({ roomName, displayName, onReady, onError }: LiveKitVoiceP
           audioCaptureDefaults: {
             autoGainControl: true,
             echoCancellation: true,
-            noiseSuppression: true,
+            noiseSuppression: true, // Browser's built-in noise suppression (Krisp-like)
             sampleRate: 48000, // High quality sample rate (48kHz)
             channelCount: 1, // Mono for voice (saves bandwidth)
           },
@@ -83,10 +83,6 @@ const LiveKitVoice = ({ roomName, displayName, onReady, onError }: LiveKitVoiceP
             },
             dtx: false, // Disable DTX to prevent cutting out
             red: true, // Redundant encoding for packet loss recovery
-          },
-          // Enable LiveKit's AI-powered noise cancellation (similar to Krisp)
-          audioOutput: {
-            noiseCancellation: true,
           },
         });
 
