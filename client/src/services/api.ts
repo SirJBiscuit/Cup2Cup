@@ -51,6 +51,10 @@ export const authAPI = {
       password,
     });
     localStorage.setItem('accessToken', data.accessToken);
+    // Store user data for display name
+    if (data.user) {
+      localStorage.setItem('userData', JSON.stringify(data.user));
+    }
     return data;
   },
 
@@ -60,12 +64,17 @@ export const authAPI = {
       password,
     });
     localStorage.setItem('accessToken', data.accessToken);
+    // Store user data for display name
+    if (data.user) {
+      localStorage.setItem('userData', JSON.stringify(data.user));
+    }
     return data;
   },
 
   logout: async () => {
     await api.post('/auth/logout');
     localStorage.removeItem('accessToken');
+    localStorage.removeItem('userData');
   },
 
   getCurrentUser: async () => {
