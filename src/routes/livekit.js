@@ -22,11 +22,11 @@ router.post('/token', optionalAuth, async (req, res) => {
       return res.status(400).json({ error: 'Room name and participant name required' });
     }
 
-    // Create room if it doesn't exist
-    await createRoom(roomName, {
-      maxParticipants: 20,
-      emptyTimeout: 300,
-    });
+    // Skip room creation - LiveKit auto-creates rooms
+    // await createRoom(roomName, {
+    //   maxParticipants: 20,
+    //   emptyTimeout: 300,
+    // });
 
     // Generate token
     const token = createLiveKitToken(roomName, participantName, {
