@@ -66,7 +66,7 @@ const LiveKitVoice = ({ roomName, displayName, onReady, onError }: LiveKitVoiceP
 
         const { token, url } = await response.json();
 
-        // Create room with enhanced audio quality settings
+        // Create room with enhanced audio quality settings (Discord Krisp-like)
         room = new Room({
           adaptiveStream: true,
           dynacast: true,
@@ -79,10 +79,14 @@ const LiveKitVoice = ({ roomName, displayName, onReady, onError }: LiveKitVoiceP
           },
           publishDefaults: {
             audioPreset: {
-              maxBitrate: 64000, // 64 kbps - good balance of quality and stability
+              maxBitrate: 128000, // 128 kbps - higher quality for clearer audio
             },
             dtx: false, // Disable DTX to prevent cutting out
             red: true, // Redundant encoding for packet loss recovery
+          },
+          // Enable LiveKit's AI-powered noise cancellation (similar to Krisp)
+          audioOutput: {
+            noiseCancellation: true,
           },
         });
 
@@ -315,10 +319,12 @@ const LiveKitVoice = ({ roomName, displayName, onReady, onError }: LiveKitVoiceP
   const handleVolumeChange = (newVolume: number) => {
     setVolume(newVolume);
     
-    // Apply volume to all remote audio elements
+    // Apply volume to all remote audio elements with boost
     document.querySelectorAll('audio').forEach((audio) => {
       if (audio !== localAudioRef.current) {
-        audio.volume = newVolume / 100;
+        // Apply volume with 1.5x boost for better loudness
+        const boostedVolume = Math.min((newVolume / 100) * 1.5, 1.0);
+        audio.volume = boostedVolume;
       }
     });
   };
