@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import socketService from '../../services/socket';
 import soundService from '../../services/sounds';
-import JitsiVoice from './JitsiVoice';
+import LiveKitVoice from './LiveKitVoice';
 import type { Participant, ChatMessage } from '../../types';
 
 const VoiceRoom = () => {
@@ -271,9 +271,9 @@ const VoiceRoom = () => {
                     </div>
                   )}
 
-                  {/* Jitsi Voice Chat - Taller iframe to show controls */}
+                  {/* LiveKit Voice Chat - Audio only, high quality */}
                   <div className="h-96 bg-gray-900 rounded-lg overflow-hidden border border-gray-700">
-                    <JitsiVoice
+                    <LiveKitVoice
                       roomName={`cup2cup-${phraseCode}`}
                       displayName={getDisplayName()}
                       onReady={() => {
