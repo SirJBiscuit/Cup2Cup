@@ -25,26 +25,35 @@ const VoiceRoom = () => {
     return saved !== null ? JSON.parse(saved) : true;
   });
 
-  // Helper function to get display name
+  // Get display name once and store it
   const getDisplayName = () => {
     const isGuest = searchParams.get('guest') === 'true';
     const guestName = searchParams.get('name');
     
+    console.log('Getting display name - isGuest:', isGuest, 'guestName:', guestName);
+    
     if (isGuest && guestName) {
-      return decodeURIComponent(guestName);
+      const decodedName = decodeURIComponent(guestName);
+      console.log('Using guest name:', decodedName);
+      return decodedName;
     }
     
     // For logged-in users, get username from localStorage
     const userDataStr = localStorage.getItem('userData');
+    console.log('userData from localStorage:', userDataStr);
+    
     if (userDataStr) {
       try {
         const userData = JSON.parse(userDataStr);
-        return userData.username || userData.email || 'User';
+        const displayName = userData.username || userData.email || 'User';
+        console.log('Using logged-in user display name:', displayName);
+        return displayName;
       } catch (e) {
         console.error('Failed to parse user data:', e);
       }
     }
     
+    console.log('Using fallback display name: User');
     return 'User';
   };
 
