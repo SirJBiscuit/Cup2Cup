@@ -116,8 +116,33 @@ const LiveKitVoice = ({ roomName, displayName, onReady, onError }: LiveKitVoiceP
         });
 
         // Monitor audio levels for voice activity
-        room.on(RoomEvent.AudioPlaybackStatusChanged, () => {
-          // Update speaking indicators
+        room.on(RoomEvent.TrackSubscribed, (track: RemoteTrack, publication: RemoteTrackPublication, participant: RemoteParticipant) => {
+          if (track.kind === 'audio') {
+            track.on('audioLevelChanged', (level: number) => {
+              if (level > 0.01) {
+                setSpeakingParticipants(prev => new Set(prev).add(participant.identity));
+              } else {
+                setSpeakingParticipants(prev => {
+                  const newSet = new Set(prev);
+                  newSet.delete(participant.identity);
+                  return newSet;
+                });
+              }
+            });
+          }
+        });
+
+        // Track local participant speaking
+        room.localParticipant.on('audioLevelChanged', (level: number) => {
+          if (level > 0.01) {
+            setSpeakingParticipants(prev => new Set(prev).add(displayName));
+          } else {
+            setSpeakingParticipants(prev => {
+              const newSet = new Set(prev);
+              newSet.delete(displayName);
+              return newSet;
+            });
+          }
         });
 
         // Update ping every 5 seconds
