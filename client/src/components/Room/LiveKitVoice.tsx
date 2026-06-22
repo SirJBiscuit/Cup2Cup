@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, memo } from 'react';
 import { Room, RoomEvent, RemoteParticipant, RemoteTrackPublication, RemoteTrack } from 'livekit-client';
 
 interface LiveKitVoiceProps {
@@ -439,4 +439,5 @@ const LiveKitVoice = ({ roomName, displayName, onReady, onError }: LiveKitVoiceP
   );
 };
 
-export default LiveKitVoice;
+// Wrap in memo to prevent re-renders when parent state changes (like chat input)
+export default memo(LiveKitVoice);
