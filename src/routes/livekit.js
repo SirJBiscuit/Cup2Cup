@@ -36,7 +36,7 @@ router.post('/token', optionalAuth, async (req, res) => {
 
     res.json({
       token,
-      url: process.env.LIVEKIT_URL || 'ws://localhost:7880',
+      url: process.env.LIVEKIT_URL || 'wss://livekit.cup2cup.xyz',
     });
   } catch (error) {
     console.error('LiveKit token error:', error);
