@@ -38,7 +38,7 @@ const LiveKitVoice = ({ roomName, displayName, onReady, onError }: LiveKitVoiceP
 
         const { token, url } = await response.json();
 
-        // Create and connect to room with TURN servers for NAT traversal
+        // Create room
         room = new Room({
           adaptiveStream: true,
           dynacast: true,
@@ -46,18 +46,6 @@ const LiveKitVoice = ({ roomName, displayName, onReady, onError }: LiveKitVoiceP
             autoGainControl: true,
             echoCancellation: true,
             noiseSuppression: true,
-          },
-          rtcConfig: {
-            iceServers: [
-              {
-                urls: 'stun:stun.l.google.com:19302',
-              },
-              {
-                urls: 'turn:openrelay.metered.ca:80',
-                username: 'openrelayproject',
-                credential: 'openrelayproject',
-              },
-            ],
           },
         });
 
@@ -96,8 +84,21 @@ const LiveKitVoice = ({ roomName, displayName, onReady, onError }: LiveKitVoiceP
           track.detach().forEach((element: HTMLMediaElement) => element.remove());
         });
 
-        // Connect to room
-        await room.connect(url, token);
+        // Connect to room with TURN servers for NAT traversal
+        await room.connect(url, token, {
+          rtcConfig: {
+            iceServers: [
+              {
+                urls: 'stun:stun.l.google.com:19302',
+              },
+              {
+                urls: 'turn:openrelay.metered.ca:80',
+                username: 'openrelayproject',
+                credential: 'openrelayproject',
+              },
+            ],
+          },
+        });
 
         // Enable microphone
         await room.localParticipant.setMicrophoneEnabled(true);
