@@ -51,6 +51,7 @@ const LiveKitVoice = ({ roomName, displayName, onReady, onError }: LiveKitVoiceP
         setError(null);
 
         // Get LiveKit token from backend
+        console.log('🎤 Requesting LiveKit token with displayName:', displayName);
         const response = await fetch(`/api/livekit/token`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
