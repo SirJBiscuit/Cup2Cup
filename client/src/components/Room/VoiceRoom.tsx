@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import socketService from '../../services/socket';
 import soundService from '../../services/sounds';
@@ -25,8 +25,8 @@ const VoiceRoom = () => {
     return saved !== null ? JSON.parse(saved) : true;
   });
 
-  // Get display name once and store it
-  const getDisplayName = () => {
+  // Memoize display name so it doesn't change on every render
+  const displayName = useMemo(() => {
     const isGuest = searchParams.get('guest') === 'true';
     const guestName = searchParams.get('name');
     
@@ -45,9 +45,9 @@ const VoiceRoom = () => {
     if (userDataStr) {
       try {
         const userData = JSON.parse(userDataStr);
-        const displayName = userData.username || userData.email || 'User';
-        console.log('Using logged-in user display name:', displayName);
-        return displayName;
+        const name = userData.username || userData.email || 'User';
+        console.log('Using logged-in user display name:', name);
+        return name;
       } catch (e) {
         console.error('Failed to parse user data:', e);
       }
@@ -55,7 +55,7 @@ const VoiceRoom = () => {
     
     console.log('Using fallback display name: User');
     return 'User';
-  };
+  }, [searchParams]);
 
   useEffect(() => {
     localStorage.setItem('darkMode', JSON.stringify(darkMode));
@@ -71,7 +71,7 @@ const VoiceRoom = () => {
     
     socket.emit('join-room', {
       phraseCode,
-      displayName: getDisplayName(),
+      displayName: displayName,
     });
 
     socketService.onJoinedRoom(async (data) => {
@@ -270,7 +270,7 @@ const VoiceRoom = () => {
                   <div className="h-96 bg-gray-900 rounded-lg overflow-hidden border border-gray-700">
                     <LiveKitVoice
                       roomName={`cup2cup-${phraseCode}`}
-                      displayName={getDisplayName()}
+                      displayName={displayName}
                       onReady={() => {
                         console.log('Jitsi voice chat ready');
                         setJitsiReady(true);
