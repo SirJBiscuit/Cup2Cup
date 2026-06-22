@@ -38,7 +38,7 @@ const LiveKitVoice = ({ roomName, displayName, onReady, onError }: LiveKitVoiceP
 
         const { token, url } = await response.json();
 
-        // Create and connect to room
+        // Create and connect to room with TURN servers for NAT traversal
         room = new Room({
           adaptiveStream: true,
           dynacast: true,
@@ -46,6 +46,18 @@ const LiveKitVoice = ({ roomName, displayName, onReady, onError }: LiveKitVoiceP
             autoGainControl: true,
             echoCancellation: true,
             noiseSuppression: true,
+          },
+          rtcConfig: {
+            iceServers: [
+              {
+                urls: 'stun:stun.l.google.com:19302',
+              },
+              {
+                urls: 'turn:openrelay.metered.ca:80',
+                username: 'openrelayproject',
+                credential: 'openrelayproject',
+              },
+            ],
           },
         });
 
