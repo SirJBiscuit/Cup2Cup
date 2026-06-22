@@ -64,8 +64,8 @@ if ! grep -q "LIVEKIT_API_KEY=" .env || [ -z "$(grep LIVEKIT_API_KEY= .env | cut
     sed -i "s/LIVEKIT_API_SECRET=.*/LIVEKIT_API_SECRET=$ESCAPED_NEW_SECRET/" .env
     
     # Update livekit-config.yaml
-    sed -i "s/APIKey:.*/APIKey: $ESCAPED_NEW_KEY/" livekit-config.yaml
-    sed -i "s/APISecret:.*/APISecret: $ESCAPED_NEW_SECRET/" livekit-config.yaml
+    sed -i "s/devkey:.*/devkey: $ESCAPED_NEW_KEY/" livekit-config.yaml
+    sed -i "s/secret:.*/secret: $ESCAPED_NEW_SECRET/" livekit-config.yaml
     
     echo "✓ New API keys generated and saved"
 else
@@ -79,8 +79,8 @@ else
     ESCAPED_KEY=$(echo "$API_KEY" | sed 's/[\/&+]/\\&/g')
     ESCAPED_SECRET=$(echo "$API_SECRET" | sed 's/[\/&+]/\\&/g')
     
-    sed -i "s/APIKey:.*/APIKey: $ESCAPED_KEY/" livekit-config.yaml
-    sed -i "s/APISecret:.*/APISecret: $ESCAPED_SECRET/" livekit-config.yaml
+    sed -i "s/devkey:.*/devkey: $ESCAPED_KEY/" livekit-config.yaml
+    sed -i "s/secret:.*/secret: $ESCAPED_SECRET/" livekit-config.yaml
     
     echo "✓ Keys synced between .env and livekit-config.yaml"
 fi
