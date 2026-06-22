@@ -104,7 +104,7 @@ const LiveKitVoice = ({ roomName, displayName, onReady, onError }: LiveKitVoiceP
                 credential: 'w1uxM55V9yVoqyVFjt+mxDBV0F87AUCemaYVQGxsPLw=',
               },
             ],
-            iceTransportPolicy: 'all',
+            iceTransportPolicy: 'relay',
           },
         });
 
