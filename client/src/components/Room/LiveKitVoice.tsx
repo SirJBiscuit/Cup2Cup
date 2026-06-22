@@ -10,7 +10,6 @@ interface LiveKitVoiceProps {
 
 const LiveKitVoice = ({ roomName, displayName, onReady, onError }: LiveKitVoiceProps) => {
   const [isConnecting, setIsConnecting] = useState(true);
-  const [isConnected, setIsConnected] = useState(false);
   const [participants, setParticipants] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const roomRef = useRef<Room | null>(null);
@@ -55,14 +54,12 @@ const LiveKitVoice = ({ roomName, displayName, onReady, onError }: LiveKitVoiceP
         // Set up event listeners
         room.on(RoomEvent.Connected, () => {
           console.log('✓ Connected to LiveKit room');
-          setIsConnected(true);
           setIsConnecting(false);
           onReady?.();
         });
 
         room.on(RoomEvent.Disconnected, () => {
           console.log('✗ Disconnected from LiveKit room');
-          setIsConnected(false);
         });
 
         room.on(RoomEvent.ParticipantConnected, (participant: RemoteParticipant) => {
