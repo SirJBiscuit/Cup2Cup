@@ -284,44 +284,47 @@ const VoiceRoom = () => {
           </div>
         </div>
 
-        <div className={`${device.isMobile ? (showChat ? 'flex' : 'hidden') : 'flex'} ${device.isMobile ? 'w-full' : 'w-96'} bg-gray-800 ${device.isMobile ? 'border-t' : 'border-l'} border-gray-700 flex-col`}>
-          <div className="p-4 border-b border-gray-700">
-            <h2 className="text-xl font-semibold">Chat</h2>
-          </div>
-          
-          <div className="flex-1 overflow-y-auto p-4 space-y-3">
-            {chatMessages.map((msg, idx) => (
-              <div key={idx} className="bg-gray-700 rounded-lg p-3">
-                <p className="font-medium text-sm text-blue-400">{msg.displayName}</p>
-                <p className="text-sm mt-1">{msg.message}</p>
-                <p className="text-xs text-gray-500 mt-1">
-                  {new Date(msg.timestamp).toLocaleTimeString()}
-                </p>
-              </div>
-            ))}
-            {chatMessages.length === 0 && (
-              <p className="text-gray-400 text-center py-8">No messages yet</p>
-            )}
-          </div>
-
-          <form onSubmit={handleSendMessage} className="p-4 border-t border-gray-700">
-            <div className="flex gap-2">
-              <input
-                type="text"
-                value={chatInput}
-                onChange={(e) => setChatInput(e.target.value)}
-                placeholder="Type a message..."
-                className="flex-1 px-4 py-2 bg-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
-              />
-              <button
-                type="submit"
-                className="px-6 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition"
-              >
-                Send
-              </button>
+        {/* Chat disabled temporarily */}
+        {false && (
+          <div className={`${device.isMobile ? (showChat ? 'flex' : 'hidden') : 'flex'} ${device.isMobile ? 'w-full' : 'w-96'} bg-gray-800 ${device.isMobile ? 'border-t' : 'border-l'} border-gray-700 flex-col`}>
+            <div className="p-4 border-b border-gray-700">
+              <h2 className="text-xl font-semibold">Chat</h2>
             </div>
-          </form>
-        </div>
+            
+            <div className="flex-1 overflow-y-auto p-4 space-y-3">
+              {chatMessages.map((msg, idx) => (
+                <div key={idx} className="bg-gray-700 rounded-lg p-3">
+                  <p className="font-medium text-sm text-blue-400">{msg.displayName}</p>
+                  <p className="text-sm mt-1">{msg.message}</p>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {new Date(msg.timestamp).toLocaleTimeString()}
+                  </p>
+                </div>
+              ))}
+              {chatMessages.length === 0 && (
+                <p className="text-gray-400 text-center py-8">No messages yet</p>
+              )}
+            </div>
+
+            <form onSubmit={handleSendMessage} className="p-4 border-t border-gray-700">
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={chatInput}
+                  onChange={(e) => setChatInput(e.target.value)}
+                  placeholder="Type a message..."
+                  className="flex-1 px-4 py-2 bg-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                />
+                <button
+                  type="submit"
+                  className="px-6 py-2 bg-blue-600 hover:bg-blue-700 rounded-lg font-medium transition"
+                >
+                  Send
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
       </div>
     </div>
   );
