@@ -52,8 +52,12 @@ const LiveKitVoice = ({ roomName, displayName, onReady, onError }: LiveKitVoiceP
         roomRef.current = room;
 
         // Set up event listeners
-        room.on(RoomEvent.Connected, () => {
+        room.on(RoomEvent.Connected, async () => {
           console.log('✓ Connected to LiveKit room');
+          
+          // Wait a moment for engine to be fully ready
+          await new Promise(resolve => setTimeout(resolve, 500));
+          
           setIsConnecting(false);
           onReady?.();
         });
@@ -86,9 +90,16 @@ const LiveKitVoice = ({ roomName, displayName, onReady, onError }: LiveKitVoiceP
 
         // Connect to room (LiveKit Cloud provides its own TURN servers)
         await room.connect(url, token);
+        console.log('✓ Room connected, enabling microphone...');
 
-        // Enable microphone
-        await room.localParticipant.setMicrophoneEnabled(true);
+        // Enable microphone with timeout
+        try {
+          await room.localParticipant.setMicrophoneEnabled(true);
+          console.log('✓ Microphone enabled');
+        } catch (micError: any) {
+          console.error('Microphone error:', micError);
+          throw new Error(`Microphone access failed: ${micError.message}`);
+        }
 
         const updateParticipants = () => {
           if (room) {
